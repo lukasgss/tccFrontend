@@ -1,0 +1,78 @@
+@tailwind components;
+@tailwind utilities;
+
+@layer tailwind {
+  @tailwind base;
+}
+
+@import "@mantine/core/styles.css";
+@import "@mantine/carousel/styles.css";
+@import "@mantine/dropzone/styles.css";
+
+$base-bg-color: #efeef1;
+$primary-blue: #635bff;
+$primary-blue-hover: #4f47de;
+$primary-blue-disabled: #7e78f4;
+$primary-purple: #b55bff;
+$primary-purple-hover: #a84df3;
+$primary-orange: #f17025;
+$primary-orange-hover: #f26616;
+$primary-light-blue: #00d4ff;
+$primary-text-color: #4d4751;
+$light-text-color: #878fac;
+$whatsapp-bg-color: #16a34a;
+$whatsapp-bg-color-hover: #11883d;
+
+:root {
+  --base-bg-color: #{$base-bg-color};
+  --primary-blue: #{$primary-blue};
+  --primary-blue-hover: #{$primary-blue-hover};
+  --primary-blue-disabled: #{$primary-blue-disabled};
+  --primary-purple: #{$primary-purple};
+  --primary-purple-hover: #{primary-purple-hover};
+  --primary-light-blue: #{$primary-light-blue};
+  --primary-orange: #{$primary-orange};
+  --primary-orange-hover: #{$primary-orange-hover};
+  --primary-text-color: #{$primary-text-color};
+  --light-text-color: #{$light-text-color};
+  --whatsapp-bg-color: #{$whatsapp-bg-color};
+  --whatsapp-bg-color-hover: #{$whatsapp-bg-color-hover};
+}
+
+@font-face {
+  font-family: "Onest Regular";
+  src:
+    url("./assets/fonts/Onest-Regular.ttf") format("truetype"),
+    url("./assets/fonts/Onest-Black.ttf") format("truetype"),
+    url("./assets/fonts/Onest-Bold.ttf") format("truetype"),
+    url("./assets/fonts/Onest-ExtraBold.ttf") format("truetype"),
+    url("./assets/fonts/Onest-ExtraLight.ttf") format("truetype"),
+    url("./assets/fonts/Onest-Light.ttf") format("truetype"),
+    url("./assets/fonts/Onest-Medium.ttf") format("truetype"),
+    url("./assets/fonts/Onest-SemiBold.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Kanit SemiBold";
+  src: url("./assets/fonts/Kanit-SemiBold.ttf") format("truetype");
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Onest Regular", sans-serif;
+}
+
+body {
+  background-color: $base-bg-color;
+  color: $primary-text-color;
+}
+
+.titleFont {
+  font-family: "Kanit SemiBold", sans-serif;
+}
+
+.mantine-Divider-label {
+  font-size: 15px;
+}

@@ -1,0 +1,118 @@
+import { OwnerResponse } from "../User/types";
+
+export interface Pet {
+  id: string;
+  name: string;
+  observations: string | null;
+  gender: Gender;
+  age: string;
+  size: string;
+  images: string[];
+  colors: Color[];
+  breed: Breed;
+  isCastrated: boolean | undefined;
+  isVaccinated: boolean | undefined;
+  isNegativeToFivFelv: boolean | undefined;
+  isNegativeToLeishmaniasis: boolean | undefined;
+}
+
+export interface Gender {
+  id: number;
+  name: "Macho" | "Fêmea";
+}
+
+export enum GenderEnum {
+  Male = 1,
+  Female = 2,
+}
+
+export interface Age {
+  id: number;
+  name: string;
+}
+
+export interface Size {
+  id: number;
+  name: string;
+}
+
+export interface PetResponse {
+  id: string;
+  name: string;
+  gender: Gender;
+  age: Age;
+  images: string[];
+  owner: OwnerResponse;
+  size: Size;
+  colors: ColorResponse[];
+  breed: BreedResponse;
+}
+
+export interface PetResponseNoOwner {
+  id: string;
+  name: string;
+  gender: Gender;
+  age: Age;
+  size: Size;
+  images: string[];
+  colors: ColorResponse[];
+  species: SpeciesResponse;
+  breed: BreedResponse;
+  isCastrated: boolean | undefined;
+  isVaccinated: boolean | undefined;
+  isNegativeToFivFelv: boolean | undefined;
+  isNegativeToLeishmaniasis: boolean | undefined;
+}
+
+export interface SimplifiedPetResponse {
+  id: string;
+  name: string;
+  observations?: string;
+  gender: Gender;
+  age: string;
+  size: string;
+  images: string[];
+}
+
+export interface ColorResponse {
+  id: number;
+  name: string;
+  hexCode: string;
+}
+
+export interface BreedResponse {
+  id: number;
+  name: string;
+}
+
+export interface SpeciesResponse {
+  id: string;
+  name: string;
+}
+
+export interface Color {
+  id: number;
+  name: string;
+  hexCode: string;
+}
+
+export interface Breed {
+  id: number;
+  name: string;
+}
+
+export interface Owner {
+  id: string;
+  email: string;
+  image: string;
+  fullName: string;
+  phoneNumber: string;
+}
+
+export interface RecentlyViewedPet {
+  id: string;
+  name: string;
+  images: string[];
+  gender: Gender;
+  breed: BreedResponse;
+}

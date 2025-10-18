@@ -1,0 +1,6 @@
+.root {
+  z-index: 10000001;
+  .closeButton:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+}

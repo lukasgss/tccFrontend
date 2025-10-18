@@ -1,0 +1,16 @@
+.indicator {
+  width: 18px;
+  height: 18px;
+  border-radius: 100%;
+  transition: width 250ms ease;
+  background-color: white;
+  border: 1px solid #ccc;
+}
+
+.control {
+  background-color: transparent !important;
+  &[data-inactive] {
+    opacity: 0;
+    cursor: default;
+  }
+}

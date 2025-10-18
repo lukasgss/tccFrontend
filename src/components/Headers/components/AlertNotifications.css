@@ -1,0 +1,29 @@
+.notifications-list {
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db #f1f1f1;
+  padding-right: 0.5rem;
+}
+
+.notifications-list::-webkit-scrollbar {
+  width: 4px; /* Made thinner */
+}
+
+.notifications-list::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 0.5rem 0;
+}
+
+.notifications-list::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 999px;
+}
+
+.notifications-list::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Firefox */
+.notifications-list {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}

@@ -1,11 +1,19 @@
 import { Button, Image } from "@mantine/core";
 import { Link } from "react-router-dom";
 import notFoundImage from "../../assets/images/not-found.svg";
+import Footer from "../../components/Footer/Footer";
 import Header from "../../components/Headers/Header/Header";
+import MetaTags from "../../components/Utils/MetaTags";
 
 export default function NotFound() {
   return (
     <>
+      <MetaTags
+        title="Página não encontrada | AcheMeuPet"
+        description="Página não encontrada."
+        keywords="adoção responsável, adoção de animais, pets para adotar, resgate animal, animais perdidos, cuidados com animais, adoção consciente"
+      />
+
       <Header />
 
       <main className="h-[calc(100vh-60px)] flex items-center justify-center">
@@ -31,6 +39,8 @@ export default function NotFound() {
           </div>
         </div>
       </main>
+
+      <Footer />
     </>
   );
 }

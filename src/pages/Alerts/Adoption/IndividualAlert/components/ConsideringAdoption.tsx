@@ -1,21 +1,34 @@
 import { Button, Title } from "@mantine/core";
-import { useContext } from "react";
+import { useContext, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Chat from "../../../../../components/Chat/Chat";
 import { AuthContext } from "../../../../../contexts/AuthContext";
+import usePaginatedUserConversations from "../../../../../queries/usePaginatedUserMessagesQuery";
+import { UserDataOnlyResponse } from "../../../../../services/requests/User/types";
 
 interface ConsideringAdoptionProps {
   alertId: string;
   petName: string;
   ownerPhoneNumber: string;
+  ownerData: UserDataOnlyResponse;
 }
 
-export default function ConsideringAdoption({ alertId, petName }: Readonly<ConsideringAdoptionProps>) {
+export default function ConsideringAdoption({ alertId, petName, ownerData }: Readonly<ConsideringAdoptionProps>) {
+  const [messageUser, setMessageUser] = useState(false);
+
   const { isAuthenticated } = useContext(AuthContext);
   const navigate = useNavigate();
 
+  const closeChat = () => {
+    setMessageUser(false);
+  };
+
+  const ref = useRef<HTMLDivElement | null>(null);
+  const { loadingFirstPage, userMessages } = usePaginatedUserConversations(ownerData?.id ?? null, isAuthenticated, ref);
+
   const handleChatWithOwner = () => {
     if (isAuthenticated) {
-      // TODO: chat
+      setMessageUser(true);
     } else {
       navigate("/login");
     }
@@ -38,6 +51,16 @@ export default function ConsideringAdoption({ alertId, petName }: Readonly<Consi
           </Button>
         </div>
       </div>
+      {messageUser && (
+        <Chat
+          close={closeChat}
+          loading={loadingFirstPage}
+          userName={ownerData.fullName}
+          userId={ownerData.id}
+          messages={userMessages ?? []}
+          ref={ref}
+        />
+      )}
     </>
   );
 }

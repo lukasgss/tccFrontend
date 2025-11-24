@@ -5,6 +5,7 @@ import { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+import ConversationsSidebar from "../../../../../components/Chat/components/ConversationSidebar";
 import FormErrorMessage from "../../../../../components/Common/Errors/FormErrorMessage";
 import { ApiError } from "../../../../../components/Common/Errors/types";
 import ModalLocationNotFound from "../../../../../components/Common/Modals/ModalLocationNotFound";
@@ -231,6 +232,8 @@ export default function CreateAdoptionAlertForm({ currentStep, changeCurrentStep
         onClickSecondaryButton={() => setFailedToLocateAddress(false)}
         onClose={() => setFailedToLocateAddress(false)}
       />
+
+      <ConversationsSidebar />
     </section>
   );
 }

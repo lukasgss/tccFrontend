@@ -106,3 +106,56 @@ export type ExternalAuthenticationData = {
   provider: "GOOGLE" | "FACEBOOK";
   idToken: string;
 };
+
+export interface CreatedAlertsResponse {
+  adoptionAlerts: AdoptionAlert[];
+  foundAnimalAlerts: FoundAnimalAlert[];
+}
+
+interface AdoptionAlert {
+  id: string;
+  description: string;
+  registrationDate: string;
+  adoptionDate: string | null;
+  adoptionRestrictions: string[];
+  pet: Pet;
+  city: string | null;
+  owner: Owner;
+  isFavorite: boolean;
+}
+
+interface FoundAnimalAlert {
+  id: string;
+  name: string;
+  description: string | null;
+  foundLocationLatitude: number;
+  foundLocationLongitude: number;
+  registrationDate: string;
+  recoveryDate: string | null;
+  pet: Pet;
+  owner: Owner;
+}
+
+interface Pet {
+  id: string;
+  name: string;
+  age: IdName;
+  breed: IdName;
+  gender: IdName;
+  images: string[];
+}
+
+interface IdName {
+  id: number;
+  name: string;
+}
+
+interface Owner {
+  id: string;
+  image: string;
+  fullName: string;
+  email: string;
+  phoneNumber: string;
+  onlyWhatsAppMessages: boolean;
+  defaultAdoptionFormUrl: string | null;
+}

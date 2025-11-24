@@ -6,18 +6,27 @@ import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../../contexts/AuthContext";
 import { ToggleAdoptionAlertFavorite } from "../../../services/requests/Alerts/Adoption/adoptionAlertService";
 
+export type AlertTypes = "adoption" | "found" | "missing";
+
 interface AlertCardProps {
   alertId: string;
   name: string;
   image: string;
   breed: string;
   gender: string;
+  type: AlertTypes;
 }
 
-export default function AlertCard({ alertId, name, image, breed, gender }: Readonly<AlertCardProps>) {
+export default function AlertCard({ alertId, name, image, breed, gender, type }: Readonly<AlertCardProps>) {
   const [hasBeenSaved, setHasBeenSaved] = useState(false);
   const navigate = useNavigate();
   const { isAuthenticated } = useContext(AuthContext);
+
+  const redirectMapping: Record<AlertTypes, string> = {
+    adoption: "/adocoes",
+    found: "/encontrados",
+    missing: "/perdidos",
+  };
 
   const theme = useMantineTheme();
 
@@ -54,7 +63,7 @@ export default function AlertCard({ alertId, name, image, breed, gender }: Reado
   }
 
   return (
-    <Link to={`/adocoes/${alertId}`}>
+    <Link to={`${redirectMapping[type]}/${alertId}`}>
       <Card
         withBorder
         shadow="md"

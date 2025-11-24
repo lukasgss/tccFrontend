@@ -2,9 +2,10 @@ import { Button, TextInput, Title, UnstyledButton } from "@mantine/core";
 import { IconCheck, IconX } from "@tabler/icons-react";
 import { useMutation } from "@tanstack/react-query";
 import { Dispatch, SetStateAction, useState } from "react";
+import { FormNotification } from "../Errors/FormMessage";
 import { ReportAdoptionAlert } from "../../../services/requests/Alerts/Adoption/adoptionAlertService";
 import getErrorMessage from "../../../utils/errorHandler";
-import { FormNotification } from "../Errors/FormMessage";
+import { ReportMissingAlert } from "../../../services/requests/Alerts/Missing/missingAlertsService";
 
 function ReportIcon() {
   return (
@@ -44,17 +45,26 @@ function ReasonButton({ selected, onClick, children }: Readonly<ReasonButtonProp
   );
 }
 
-export type ReportTypes = "violence" | "spam" | "sexual content" | "hate" | "other";
+export type ReportTypes = "violence" | "spam" | "sexual content" | "hate" | "animal sale" | "other";
+export type AlertTypes = "adoption" | "missing" | "found";
 
 interface ReportContentProps {
   alertId: string;
   setReportMessage: Dispatch<SetStateAction<FormNotification | null>>;
+  alertType: AlertTypes;
   closeModal: () => void;
 }
 
-export default function ReportContent({ alertId, setReportMessage, closeModal }: Readonly<ReportContentProps>) {
+export default function ReportContent({
+  alertType,
+  alertId,
+  setReportMessage,
+  closeModal,
+}: Readonly<ReportContentProps>) {
   const [selected, setSelected] = useState<ReportTypes | null>(null);
   const [otherReason, setOtherReason] = useState<string>();
+
+  console.log(alertType);
 
   const reportOptions = [
     {
@@ -89,10 +99,12 @@ export default function ReportContent({ alertId, setReportMessage, closeModal }:
       return;
     }
 
-    if (reason.value === "other" && otherReason) {
-      await ReportAdoptionAlert(alertId, otherReason);
-    } else {
-      await ReportAdoptionAlert(alertId, reason.label);
+    const reportReason = reason.value === "other" && otherReason ? otherReason : reason.label;
+
+    if (alertType === "adoption") {
+      await ReportAdoptionAlert(alertId, reportReason);
+    } else if (alertType === "missing") {
+      await ReportMissingAlert(alertId, reportReason);
     }
   };
 
@@ -109,19 +121,23 @@ export default function ReportContent({ alertId, setReportMessage, closeModal }:
     },
   });
 
+  const getModalTitle = () => {
+    return alertType === "adoption" ? "Denunciar adoção" : "Denunciar alerta de desaparecimento";
+  };
+
   return (
     <div className="relative transform overflow-hidden text-left transition-all sm:w-full sm:max-w-lg pt-4">
       <div className="p-2 pb-4">
         <div className="relative flex items-center justify-start">
           <div
-            className="mx-auto absolute p-1 flex flex-shrink-0 items-center justify-center 
+            className="mx-auto absolute p-1 flex flex-shrink-0 items-center justify-center
           rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10"
           >
             <ReportIcon />
           </div>
           <div className="flex-1 flex justify-center text-center sm:ml-4 sm:mt-0 sm:text-left">
             <Title order={4} className="font-semibold leading-6 text-gray-900" id="modal-title">
-              Denunciar adoção
+              {getModalTitle()}
             </Title>
           </div>
         </div>

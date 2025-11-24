@@ -49,6 +49,7 @@ export default function SuggestedAdoptionAlerts() {
                 {suggestedAlerts?.map((alert) => (
                   <Grid.Col key={alert.id} span="content">
                     <AlertCard
+                      type="adoption"
                       alertId={alert.id}
                       name={alert.pet.name}
                       breed={alert.pet.breed.name}

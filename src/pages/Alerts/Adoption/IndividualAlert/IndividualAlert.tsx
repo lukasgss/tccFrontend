@@ -6,6 +6,7 @@ import { useMutation } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { useContext, useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import ConversationsSidebar from "../../../../components/Chat/components/ConversationSidebar";
 import AlertCarousel from "../../../../components/Common/Carousel/AlertCarousel/AlertCarousel";
 import ModalCarousel from "../../../../components/Common/Carousel/ModalCarousel/ModalCarousel";
 import FormMessage, { FormNotification } from "../../../../components/Common/Errors/FormMessage";
@@ -13,7 +14,9 @@ import { ApiError } from "../../../../components/Common/Errors/types";
 import AttachmentFile from "../../../../components/Common/File/AttachmentFile";
 import ReportContent from "../../../../components/Common/Modals/ReportContent";
 import IndividualAlertSkeleton from "../../../../components/Common/Skeletons/IndividualAlertSkeleton";
+import Footer from "../../../../components/Footer/Footer";
 import Header from "../../../../components/Headers/Header/Header";
+import MetaTags from "../../../../components/Utils/MetaTags";
 import { defaultFormErrorMessage } from "../../../../constants/applicationConstants";
 import { AuthContext } from "../../../../contexts/AuthContext";
 import Notify from "../../../../hooks/notifications/notifications";
@@ -148,6 +151,7 @@ export default function IndividualAlert() {
     }
 
     const petData: RecentlyViewedPet = {
+      type: "adoption",
       id: data.id,
       name: data.pet.name,
       images: data.pet.images,
@@ -268,6 +272,11 @@ export default function IndividualAlert() {
   return (
     <>
       <main className="relative">
+        <MetaTags
+          title={`Adoção de ${data.pet.name} | AcheMeuPet`}
+          description={`Conheça ${data.pet.name}, ${data.pet.gender.name === "Macho" ? "um" : "uma"} fofura à espera de um lar amoroso e um melhor amigo. Descubra sua personalidade única e como ${data.pet.gender.name === "Macho" ? "adotá-lo" : "adotá-la"} através do AcheMeuPet.`}
+          keywords="adoção animal, adoção de animais, listagem de adoções, pets para adotar, AcheMeuPet, resgate animal, animais perdidos"
+        />
         <Header />
         <AlertCarousel images={data.pet.images} onClickImage={(imageIndex: number) => handleImageClick(imageIndex)} />
         <ModalCarousel
@@ -473,6 +482,7 @@ export default function IndividualAlert() {
             <div className="flex flex-col gap-5 w-full lg:max-w-[350px] h-fit mb-6 lg:mb-0">
               <ConsideringAdoption
                 alertId={data.id}
+                ownerData={data.owner}
                 ownerPhoneNumber={data.owner.phoneNumber}
                 petName={data.pet.name}
               />
@@ -480,11 +490,19 @@ export default function IndividualAlert() {
             </div>
           ) : null}
         </div>
+        <ConversationsSidebar />
       </main>
 
       <Modal opened={reportContentOpened} onClose={closeReportContent} centered withCloseButton={false}>
-        <ReportContent alertId={data.id} closeModal={closeReportContent} setReportMessage={setReportMessage} />
+        <ReportContent
+          alertType="adoption"
+          alertId={data.id}
+          closeModal={closeReportContent}
+          setReportMessage={setReportMessage}
+        />
       </Modal>
+
+      <Footer />
     </>
   );
 }

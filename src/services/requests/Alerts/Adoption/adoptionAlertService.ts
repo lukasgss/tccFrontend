@@ -2,7 +2,6 @@ import { AxiosResponse } from "axios";
 import { Coordinate } from "../../../../hooks/useGeoLocation";
 import { API } from "../../../Api";
 import {
-  AdoptionAlertListingResponse,
   AdoptionAlertResponse,
   PaginatedAdoptionAlertResponse,
   SuggestedAlert,
@@ -69,18 +68,11 @@ export async function UpdateAdoptionAlert(formData: FormData, alertId: string): 
   return response.data;
 }
 
-export async function GetUserSavedAlerts(signal: AbortSignal): Promise<AdoptionAlertListingResponse[]> {
-  const savedAlerts = await API.get("/adoption-alerts/saved", {
+export async function GetUserSavedAlerts(signal: AbortSignal): Promise<any> {
+  const savedAlerts = await API.get("/users/saved", {
     signal,
   });
   return savedAlerts.data;
-}
-
-export async function GetUserCreatedAlerts(signal: AbortSignal): Promise<AdoptionAlertListingResponse[]> {
-  const createdAlerts = await API.get("/adoption-alerts/created", {
-    signal,
-  });
-  return createdAlerts.data;
 }
 
 export async function GenerateAdoptionSharingPoster(alertId: string): Promise<Blob> {

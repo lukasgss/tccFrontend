@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { GetUserCreatedAlerts } from "../services/requests/Alerts/Adoption/adoptionAlertService";
+import { GetUserCreatedAlerts } from "../services/requests/User/UserService";
 
 export default function useUserCreatedAlertsQuery() {
   return useQuery({

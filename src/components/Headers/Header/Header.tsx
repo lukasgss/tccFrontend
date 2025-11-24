@@ -1,6 +1,6 @@
 import { Box, Burger, Button, Divider, Drawer, Group, rem, useMantineTheme } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { IconHome, IconZoomExclamation } from "@tabler/icons-react";
+import { IconEyeX, IconHome, IconRadar, IconZoomExclamation } from "@tabler/icons-react";
 import { useContext } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import logoImage from "../../../assets/images/ache-meu-pet-logo.webp";
@@ -9,6 +9,8 @@ import MobileNavButton from "../components/MobileNavButton";
 import UserData from "../components/UserData";
 
 import { AuthContext } from "../../../contexts/AuthContext";
+import useAdoptionNotificationsQuery from "../../../queries/useAdoptionNotificationsQuery";
+import AlertNotifications from "../components/AlertNotifications";
 import classes from "./header.module.css";
 
 interface HeaderProps {
@@ -26,6 +28,16 @@ const links = [
     title: "Adoção",
     route: "/adocoes",
   },
+  {
+    icon: <IconEyeX style={{ width: rem(20), height: rem(20), marginBottom: "3px" }} />,
+    title: "Perdidos",
+    route: "/perdidos",
+  },
+  {
+    icon: <IconRadar style={{ width: rem(20), height: rem(20), marginBottom: "3px" }} />,
+    title: "Encontrados",
+    route: "/encontrados",
+  },
 ];
 
 export default function Header({ showRegistrationButtons = true }: Readonly<HeaderProps>) {
@@ -34,6 +46,8 @@ export default function Header({ showRegistrationButtons = true }: Readonly<Head
   const location = useLocation();
 
   const { isAuthenticated } = useContext(AuthContext);
+
+  const { data: notifications, refetch: refetchNotifications } = useAdoptionNotificationsQuery(isAuthenticated);
 
   return (
     <Box className="sticky top-0 z-[999]">
@@ -60,6 +74,7 @@ export default function Header({ showRegistrationButtons = true }: Readonly<Head
 
           {isAuthenticated && (
             <div className="hidden min-[822px]:flex gap-3">
+              <AlertNotifications notifications={notifications} refetchNotifications={refetchNotifications} />
               <UserData />
             </div>
           )}
@@ -106,6 +121,8 @@ export default function Header({ showRegistrationButtons = true }: Readonly<Head
             <div>
               <UserData />
             </div>
+            <Divider my="md" />
+            <AlertNotifications notifications={notifications} refetchNotifications={refetchNotifications} />
             <Divider my="md" />
           </>
         ) : (

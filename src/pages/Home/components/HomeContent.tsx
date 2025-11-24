@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import iconCat from "../../../assets/icons/animals/iconCat.svg";
 import iconDog from "../../../assets/icons/animals/iconDog.webp";
+import iconPaw from "../../../assets/icons/animals/iconPaw.svg";
 import dogAndCat from "../../../assets/images/main-dog-and-cat.webp";
 import dogAndCatMobile from "../../../assets/images/mobile-main-dog-and-cat.webp";
 import useBreedsQuery from "../../../queries/useBreedsQuery";
@@ -27,6 +28,12 @@ const animalCards: AnimalCardData[] = [
     text: "Gatos",
     speciesId: 2,
     icon: <Image src={iconCat} alt="Ícone de gatos" className={`${iconClasses} object-contain`} />,
+  },
+  {
+    type: "other",
+    text: "Outros animais",
+    speciesId: null,
+    icon: <Image src={iconPaw} alt="Ícone de outros animais" className={iconClasses} />,
   },
 ];
 

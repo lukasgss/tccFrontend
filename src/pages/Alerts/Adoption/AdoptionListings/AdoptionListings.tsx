@@ -2,12 +2,14 @@ import { em, Loader } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 import { LatLng } from "leaflet";
 import { useCallback, useEffect, useState } from "react";
+import ConversationsSidebar from "../../../../components/Chat/components/ConversationSidebar";
 import AlertCard from "../../../../components/Common/Alerts/AlertCard/AlertCard";
 import DefaultError from "../../../../components/Common/Errors/DefaultError";
 import NoData from "../../../../components/Common/NoData/NoData";
 import FiltersSkeleton from "../../../../components/Common/Skeletons/AdoptionListingsSkeleton";
 import Footer from "../../../../components/Footer/Footer";
 import Header from "../../../../components/Headers/Header/Header";
+import MetaTags from "../../../../components/Utils/MetaTags";
 import useAgesQuery from "../../../../queries/useAgesQuery";
 import useBreedsQuery from "../../../../queries/useBreedsQuery";
 import useColorsQuery from "../../../../queries/useColorsQuery";
@@ -240,6 +242,7 @@ export default function AdoptionListings() {
       >
         {adoptionAlerts.map((alert) => (
           <AlertCard
+            type="adoption"
             key={alert.id}
             alertId={alert.id}
             owner={alert.owner}
@@ -331,6 +334,11 @@ export default function AdoptionListings() {
   return (
     <>
       <main className="relative">
+        <MetaTags
+          title="Adoções | AcheMeuPet"
+          description="Encontre seu novo companheiro! Explore nossa listagem de animais disponíveis para adoção."
+          keywords="adoção de animais, listagem de adoções, pets para adotar, resgate animal, animais perdidos"
+        />
         <Header />
         <section className="lg:flex mb-6">
           {isMobile ? (
@@ -375,6 +383,7 @@ export default function AdoptionListings() {
             )}
           </div>
         </section>
+        <ConversationsSidebar />
       </main>
 
       <Footer />

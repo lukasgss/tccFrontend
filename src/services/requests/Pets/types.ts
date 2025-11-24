@@ -1,3 +1,4 @@
+import { AlertTypes } from "../../../pages/Home/components/AlertCard";
 import { OwnerResponse } from "../User/types";
 
 export interface Pet {
@@ -110,6 +111,7 @@ export interface Owner {
 }
 
 export interface RecentlyViewedPet {
+  type: AlertTypes;
   id: string;
   name: string;
   images: string[];

@@ -9,7 +9,9 @@ import { z } from "zod";
 import FormErrorMessage from "../../components/Common/Errors/FormErrorMessage";
 import { ApiError } from "../../components/Common/Errors/types";
 import InputText from "../../components/Common/Inputs/InputText";
+import Footer from "../../components/Footer/Footer";
 import Header from "../../components/Headers/Header/Header";
+import MetaTags from "../../components/Utils/MetaTags";
 import { requiredFormFieldErrorMessage } from "../../constants/applicationConstants";
 import { ForgotPasswordData } from "../../services/requests/User/types";
 import { SendForgotPasswordInstructions } from "../../services/requests/User/UserService";
@@ -62,48 +64,61 @@ export default function ForgotPassword() {
   });
 
   return (
-    <main className="min-h-[calc(100vh)]">
-      <Header />
-      <div className="flex flex-col gap-3 bg-white rounded shadow w-4/5 xl:w-1/2 mx-auto p-8 mt-20">
-        {instructionsHaveBeenSent ? (
-          <InstructionsSentToEmail sendEmailAgain={handleSendInstructionsClick} loadingSendingEmailAgain={isPending} />
-        ) : (
-          <>
-            <Title order={2}>Redefinir senha</Title>
-            <Text>
-              Digite o e-mail associado com sua conta que enviaremos um e-mail com instruções para a redefinição da
-              senha.
-            </Text>
+    <>
+      <main className="min-h-[calc(100vh)]">
+        <MetaTags
+          title="Esqueci minha senha | AcheMeuPet"
+          description="Recupere o acesso à sua conta AcheMeuPet de forma rápida e segura. Sua conta está a apenas alguns cliques de distância!"
+          keywords="esqueci a senha, esqueci minha senha, adoção animal, adoção de animais, listagem de adoções, pets para adotar, resgate animal, animais perdidos"
+        />
 
-            {sendInstructionsErrorMessage && (
-              <FormErrorMessage
-                message={sendInstructionsErrorMessage}
-                closeErrorMessage={() => setSendInstructionsErrorMessage(null)}
-              />
-            )}
+        <Header />
+        <div className="flex flex-col gap-3 bg-white rounded shadow w-4/5 xl:w-1/2 mx-auto p-8 mt-20">
+          {instructionsHaveBeenSent ? (
+            <InstructionsSentToEmail
+              sendEmailAgain={handleSendInstructionsClick}
+              loadingSendingEmailAgain={isPending}
+            />
+          ) : (
+            <>
+              <Title order={2}>Redefinir senha</Title>
+              <Text>
+                Digite o e-mail associado com sua conta que enviaremos um e-mail com instruções para a redefinição da
+                senha.
+              </Text>
 
-            <form onSubmit={onSubmit} className="flex flex-col gap-3">
-              <InputText
-                name="email"
-                register={register}
-                required
-                error={errors.email}
-                label="Endereço de e-mail"
-                placeholder="email@email.com"
-              />
+              {sendInstructionsErrorMessage && (
+                <FormErrorMessage
+                  message={sendInstructionsErrorMessage}
+                  closeErrorMessage={() => setSendInstructionsErrorMessage(null)}
+                />
+              )}
 
-              <div className="flex flex-col-reverse gap-2.5 sm:flex-row sm:gap-5 justify-end">
-                <Button variant="outline" onClick={() => navigate("/login")}>
-                  Voltar
-                </Button>
-                <Button type="submit" loading={isPending}>
-                  Enviar instruções
-                </Button>
-              </div>
-            </form>
-          </>
-        )}
-      </div>
-    </main>
+              <form onSubmit={onSubmit} className="flex flex-col gap-3">
+                <InputText
+                  name="email"
+                  register={register}
+                  required
+                  error={errors.email}
+                  label="Endereço de e-mail"
+                  placeholder="email@email.com"
+                />
+
+                <div className="flex flex-col-reverse gap-2.5 sm:flex-row sm:gap-5 justify-end">
+                  <Button variant="outline" onClick={() => navigate("/login")}>
+                    Voltar
+                  </Button>
+                  <Button type="submit" loading={isPending}>
+                    Enviar instruções
+                  </Button>
+                </div>
+              </form>
+            </>
+          )}
+        </div>
+      </main>
+
+      <Footer />
+    </>
   );
 }

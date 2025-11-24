@@ -8,6 +8,7 @@ import { z } from "zod";
 import FormMessage, { FormNotification } from "../../components/Common/Errors/FormMessage";
 import InputPassword from "../../components/Common/Inputs/InputPassword";
 import Header from "../../components/Headers/Header/Header";
+import MetaTags from "../../components/Utils/MetaTags";
 import { requiredFormFieldErrorMessage } from "../../constants/applicationConstants";
 import { RedefineUserPassword } from "../../services/requests/User/UserService";
 import { ResetPasswordRequest } from "../../services/requests/User/types";
@@ -81,6 +82,12 @@ export default function RedefinePassword() {
 
   return (
     <>
+      <MetaTags
+        title="Redefinir senha | AcheMeuPet"
+        description="Recupere o acesso à sua conta AcheMeuPet de forma rápida e segura. Sua conta está a apenas alguns cliques de distância!"
+        keywords="redefinir senha, redefinir minha senha, adoção animal, adoção de animais, listagem de adoções, pets para adotar, resgate animal, animais perdidos"
+      />
+
       <Header />
       <main>
         <div className="flex flex-col gap-3 bg-white rounded shadow w-4/5 xl:w-1/2 mx-auto p-8 mt-20">

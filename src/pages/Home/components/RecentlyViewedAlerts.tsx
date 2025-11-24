@@ -22,6 +22,7 @@ export default function RecentlyViewedAlerts() {
             {recentlyViewedAlerts?.map((alert) => (
               <Grid.Col key={alert.id} span="content">
                 <AlertCard
+                  type={alert.type}
                   alertId={alert.id}
                   breed={alert.breed.name}
                   gender={alert.gender.name}

@@ -12,7 +12,9 @@ import InputCheckbox from "../../components/Common/Inputs/InputCheckbox";
 import InputPassword from "../../components/Common/Inputs/InputPassword";
 import InputPhone from "../../components/Common/Inputs/InputPhone";
 import InputText from "../../components/Common/Inputs/InputText";
+import Footer from "../../components/Footer/Footer";
 import Header from "../../components/Headers/Header/Header";
+import MetaTags from "../../components/Utils/MetaTags";
 import { AuthContext } from "../../contexts/AuthContext";
 import { RegisterFormData } from "../../services/requests/User/types";
 
@@ -81,6 +83,12 @@ export default function Register() {
 
   return (
     <>
+      <MetaTags
+        title="Cadastro | AcheMeuPet"
+        description="Junte-se à comunidade AcheMeuPet! Crie sua conta e comece a fazer a diferença hoje. Adote, doe, ou ajude animais perdidos. Cada cadastro é um passo para um mundo melhor para os animais."
+        keywords="cadastro, cadastro achemeupet, adoção animal, adoção de animais, listagem de adoções, pets para adotar, resgate animal, animais perdidos"
+      />
+
       <Header />
       <div
         className="min-h-[calc(100vh-70px)] md:h-[calc(100vh-60px)] py-6 flex justify-center 
@@ -178,6 +186,8 @@ export default function Register() {
           </Paper>
         </main>
       </div>
+
+      <Footer />
     </>
   );
 }

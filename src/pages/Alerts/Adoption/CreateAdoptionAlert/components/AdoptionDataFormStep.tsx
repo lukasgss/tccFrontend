@@ -91,7 +91,7 @@ export default function AdoptionDataFormStep({
             placeholder="Minas Gerais"
             clearable={false}
             data={states}
-            required={false}
+            required
           />
 
           {shouldShowCityInput && (
@@ -105,7 +105,7 @@ export default function AdoptionDataFormStep({
               placeholder="Belo Horizonte"
               clearable={false}
               data={cities}
-              required={false}
+              required
             />
           )}
 

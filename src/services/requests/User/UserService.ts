@@ -1,6 +1,7 @@
 import { AxiosResponse } from "axios";
 import { API } from "../../Api";
 import {
+  CreatedAlertsResponse,
   CreateUserPreferencesRequest,
   ExternalAuthenticationData,
   ForgotPasswordData,
@@ -71,4 +72,12 @@ export async function SendForgotPasswordInstructions(forgotPasswordData: ForgotP
 
 export async function RedefineUserPassword(resetPasswordData: ResetPasswordRequest) {
   await API.post("/users/reset-password-forgot", resetPasswordData);
+}
+
+export async function GetUserCreatedAlerts(signal: AbortSignal): Promise<CreatedAlertsResponse> {
+  const { data } = await API.get("/users/created", {
+    signal,
+  });
+
+  return data;
 }

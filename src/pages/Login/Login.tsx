@@ -8,7 +8,9 @@ import { z } from "zod";
 import FormErrorMessage from "../../components/Common/Errors/FormErrorMessage";
 import InputPassword from "../../components/Common/Inputs/InputPassword";
 import InputText from "../../components/Common/Inputs/InputText";
+import Footer from "../../components/Footer/Footer";
 import Header from "../../components/Headers/Header/Header";
+import MetaTags from "../../components/Utils/MetaTags";
 import { AuthContext } from "../../contexts/AuthContext";
 import { LoginFormData } from "../../services/requests/User/types";
 
@@ -45,6 +47,12 @@ export default function Login(props: PaperProps) {
 
   return (
     <>
+      <MetaTags
+        title="Login | AcheMeuPet"
+        description="Acesse sua conta e faça a diferença na vida de um animal. Gerencie adoções, acompanhe alertas e conecte-se com outros amantes dos animais. Juntos, podemos salvar mais vidas!"
+        keywords="login, login achemeupet, adoção animal, adoção de animais, listagem de adoções, pets para adotar, resgate animal, animais perdidos"
+      />
+
       <Header />
       <div className="min-h-[calc(100vh-70px)] md:h-[calc(100vh-60px)] flex justify-center items-center bg-[var(--base-bg-color)] mb-8">
         <main className="w-full mx-3 sm:mx-8 max-w-[500px] border-2 border-gray-200 rounded-lg">
@@ -107,6 +115,8 @@ export default function Login(props: PaperProps) {
           </Paper>
         </main>
       </div>
+
+      <Footer />
     </>
   );
 }

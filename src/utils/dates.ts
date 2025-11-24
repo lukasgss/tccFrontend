@@ -38,7 +38,7 @@ export function formatTextDate(date: Date) {
   return "agora";
 }
 
-export const formatDateOnly = (date?: string) => {
+export const formatDateOnly = (date?: string | null) => {
   const months = {
     1: "janeiro",
     2: "fevereiro",

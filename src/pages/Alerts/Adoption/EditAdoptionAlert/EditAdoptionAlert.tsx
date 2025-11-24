@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import ConversationsSidebar from "../../../../components/Chat/components/ConversationSidebar";
 import FormStepper from "../../../../components/Common/FormStepper/FormStepper";
 import Loading from "../../../../components/Common/Loading/Loading";
+import Footer from "../../../../components/Footer/Footer";
 import Header from "../../../../components/Headers/Header/Header";
+import MetaTags from "../../../../components/Utils/MetaTags";
 import useAdoptionFormSteps from "../../../../hooks/alerts/useAdoptionFormSteps";
 import useAdoptionAlertByIdQuery from "../../../../queries/useAdoptionAlertByIdQuery";
 import { AlertSchemaFormData } from "../CreateAdoptionAlert/types";
@@ -69,6 +72,12 @@ export default function EditAdoptionAlert() {
   return (
     <>
       <main className="relative">
+        <MetaTags
+          title="Edição de alerta de adoção | AcheMeuPet"
+          description="Atualize as informações do seu alerta de adoção e aumente as chances de encontrar o lar ideal para o animal com o AcheMeuPet."
+          keywords="adopção animal, adoção de animais, listagem de adoções, pets para adotar, AcheMeuPet, resgate animal, animais perdidos"
+        />
+
         <Header />
         <div className="mx-7 bg-white md:mx-20 pt-3 mt-5 rounded-md relative">
           <div className="mt-8 w-3/4 max-w-[900px] mx-auto">
@@ -91,7 +100,11 @@ export default function EditAdoptionAlert() {
             </div>
           )}
         </div>
+
+        <ConversationsSidebar />
       </main>
+
+      <Footer />
     </>
   );
 }

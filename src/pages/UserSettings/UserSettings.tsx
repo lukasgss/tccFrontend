@@ -1,5 +1,7 @@
 import { useState } from "react";
+import ConversationsSidebar from "../../components/Chat/components/ConversationSidebar";
 import Header from "../../components/Headers/Header/Header";
+import MetaTags from "../../components/Utils/MetaTags";
 import UserTabs, { Tab } from "./components/UserTabs";
 import PreferencesTab from "./components/tabs/PreferencesTab";
 import RedefinePassword from "./components/tabs/RedefinePasswordTab";
@@ -10,6 +12,12 @@ export default function UserSettings() {
 
   return (
     <main className="relative">
+      <MetaTags
+        title="Minha conta | AcheMeuPet"
+        description="Gerencie sua conta AcheMeuPet. Acompanhe adoções, receba notificações e gerencie suas informações. Sua central de controle para fazer a diferença na vida dos animais. Personalize sua experiência agora!"
+        keywords="minha conta, configurações, configurações da conta, adoção animal, adoção de animais, listagem de adoções, pets para adotar, resgate animal, animais perdidos"
+      />
+
       <Header />
 
       <div
@@ -27,6 +35,8 @@ export default function UserSettings() {
           {activeTab === "preferences" && <PreferencesTab />}
         </div>
       </div>
+
+      <ConversationsSidebar />
     </main>
   );
 }

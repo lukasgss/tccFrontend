@@ -18,19 +18,24 @@ import { Link, useNavigate } from "react-router-dom";
 
 import { HeartStraight } from "@phosphor-icons/react";
 import { useMutation } from "@tanstack/react-query";
-import { useContext } from "react";
+import { useContext, useRef, useState } from "react";
 import classes from "./AlertCard.module.css";
 
 import { AuthContext } from "../../../../contexts/AuthContext";
 import Notify from "../../../../hooks/notifications/notifications";
+import usePaginatedUserConversations from "../../../../queries/usePaginatedUserMessagesQuery";
 import { ToggleAdoptionAlertFavorite } from "../../../../services/requests/Alerts/Adoption/adoptionAlertService";
 import { PetResponseNoOwner } from "../../../../services/requests/Pets/types";
 import { UserDataOnlyResponse } from "../../../../services/requests/User/types";
 import getErrorMessage from "../../../../utils/errorHandler";
 import { getAdoptionAlertWhatsappMessage, getShareAdoptionAlertMessage } from "../../../../utils/shareContent";
+import Chat from "../../../Chat/Chat";
 import ShareDropdown from "../../Share/ShareDropdown";
+import { AlertTypes } from "../../../../pages/Home/components/AlertCard";
+import { ToggleFoundAlertFavorite } from "../../../../services/requests/Alerts/Found/foundAlertsService";
 
 interface AlertCardProps {
+  type: AlertTypes;
   alertId: string;
   owner: UserDataOnlyResponse;
   pet: PetResponseNoOwner;
@@ -41,6 +46,7 @@ interface AlertCardProps {
 }
 
 export default function AlertCard({
+  type,
   alertId,
   owner,
   pet,
@@ -51,14 +57,29 @@ export default function AlertCard({
 }: Readonly<AlertCardProps>) {
   const theme = useMantineTheme();
   const navigate = useNavigate();
-  const { isAuthenticated } = useContext(AuthContext);
+  const { isAuthenticated, userData } = useContext(AuthContext);
+
+  const [userToMessage, setUserToMessage] = useState<UserDataOnlyResponse | null>(null);
 
   const {
     mutateAsync: toggleAdoptionAlertFavoriteAsync,
-    isPending,
-    isError,
+    isPending: adoptionPending,
+    isError: adoptionError,
   } = useMutation({
     mutationFn: () => ToggleAdoptionAlertFavorite(alertId),
+    onSuccess: () => toggleAlertFavorite?.(alertId),
+    onError: (e) => {
+      const errorMessage = getErrorMessage(e);
+      Notify({ type: "error", message: errorMessage });
+    },
+  });
+
+  const {
+    mutateAsync: toggleFoundAlertFavoriteAsync,
+    isPending: foundPending,
+    isError: foundError,
+  } = useMutation({
+    mutationFn: () => ToggleFoundAlertFavorite(alertId),
     onSuccess: () => toggleAlertFavorite?.(alertId),
     onError: (e) => {
       const errorMessage = getErrorMessage(e);
@@ -73,20 +94,40 @@ export default function AlertCard({
       navigate("/login");
     }
 
-    await toggleAdoptionAlertFavoriteAsync();
+    if (type === "adoption") {
+      await toggleAdoptionAlertFavoriteAsync();
+    } else if (type === "found") {
+      await toggleFoundAlertFavoriteAsync();
+    }
   }
+
+  const ref = useRef<HTMLDivElement | null>(null);
+  const { loadingFirstPage, userMessages } = usePaginatedUserConversations(
+    userToMessage?.id ?? null,
+    isAuthenticated,
+    ref,
+  );
 
   const handleChatWithAlertOwner = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
 
     if (isAuthenticated) {
-      // TODO: Chat
+      setUserToMessage(owner);
     } else {
       navigate("/login");
     }
   };
 
-  const alertUrl = `/adocoes/${alertId}`;
+  const closeChat = () => {
+    setUserToMessage(null);
+  };
+
+  const urlMappings: Record<AlertTypes, string> = {
+    adoption: "adocoes",
+    found: "encontrados",
+    missing: "perdidos",
+  };
+  const alertUrl = `/${urlMappings[type]}/${alertId}`;
 
   return (
     <>
@@ -122,63 +163,75 @@ export default function AlertCard({
               </Text>
             </Center>
 
-            <Group gap={8} mr={0}>
-              {showMessageOwner && (
-                <Tooltip label="Enviar mensagem pela plataforma ao criador do alerta">
-                  <ActionIcon
-                    variant="light"
-                    className={classes.action}
-                    onClick={(e) => handleChatWithAlertOwner(e)}
-                    aria-label="Enviar mensagem ao criador do alerta"
-                  >
-                    <IconMessage style={{ width: rem(16), height: rem(16) }} color={theme.colors.gray[9]} />
-                  </ActionIcon>
-                </Tooltip>
-              )}
-              <Menu transitionProps={{ transition: "pop" }} withArrow position="bottom-end" withinPortal>
-                <Menu.Target>
-                  <ActionIcon
-                    variant="light"
-                    className={classes.action}
-                    onClick={(e) => e.preventDefault()}
-                    aria-label="Compartilhar"
-                  >
-                    <Tooltip label="Compartilhar">
-                      <IconShare style={{ width: rem(16), height: rem(16) }} color={theme.colors.blue[6]} />
-                    </Tooltip>
-                  </ActionIcon>
-                </Menu.Target>
-                <Menu.Dropdown className="shadow">
-                  <ShareDropdown
-                    whatsappMessage={getAdoptionAlertWhatsappMessage(pet.gender.name, pet.name, alertUrl)}
-                    twitterMessage={getShareAdoptionAlertMessage(pet.gender.name, pet.name)}
-                  />
-                </Menu.Dropdown>
-              </Menu>
-              {showIsFavorite ? (
-                <Tooltip label={isFavorite ? "Remover dos favoritos" : "Adicionar aos favoritos"}>
-                  <ActionIcon
-                    variant="light"
-                    className={classes.action}
-                    onClick={(e) => handleFavoriteAlert(e)}
-                    aria-label="Alternar entre favorito e não favorito"
-                  >
-                    {isPending && !isError ? (
-                      <Loader size={16} />
-                    ) : (
-                      <HeartStraight
-                        style={{ width: rem(16), height: rem(16) }}
-                        weight={isFavorite ? "fill" : "regular"}
-                        color={theme.colors.red[6]}
-                      />
-                    )}
-                  </ActionIcon>
-                </Tooltip>
-              ) : null}
-            </Group>
+            {userData?.id !== owner.id ? (
+              <Group gap={8} mr={0}>
+                {showMessageOwner && (
+                  <Tooltip label="Enviar mensagem pela plataforma ao criador do alerta">
+                    <ActionIcon
+                      variant="light"
+                      className={classes.action}
+                      onClick={(e) => handleChatWithAlertOwner(e)}
+                      aria-label="Enviar mensagem ao criador do alerta"
+                    >
+                      <IconMessage style={{ width: rem(16), height: rem(16) }} color={theme.colors.gray[9]} />
+                    </ActionIcon>
+                  </Tooltip>
+                )}
+                <Menu transitionProps={{ transition: "pop" }} withArrow position="bottom-end" withinPortal>
+                  <Menu.Target>
+                    <ActionIcon
+                      variant="light"
+                      className={classes.action}
+                      onClick={(e) => e.preventDefault()}
+                      aria-label="Compartilhar"
+                    >
+                      <Tooltip label="Compartilhar">
+                        <IconShare style={{ width: rem(16), height: rem(16) }} color={theme.colors.blue[6]} />
+                      </Tooltip>
+                    </ActionIcon>
+                  </Menu.Target>
+                  <Menu.Dropdown className="shadow">
+                    <ShareDropdown
+                      whatsappMessage={getAdoptionAlertWhatsappMessage(pet.gender.name, pet.name, alertUrl)}
+                      twitterMessage={getShareAdoptionAlertMessage(pet.gender.name, pet.name)}
+                    />
+                  </Menu.Dropdown>
+                </Menu>
+                {showIsFavorite ? (
+                  <Tooltip label={isFavorite ? "Remover dos favoritos" : "Adicionar aos favoritos"}>
+                    <ActionIcon
+                      variant="light"
+                      className={classes.action}
+                      onClick={(e) => handleFavoriteAlert(e)}
+                      aria-label="Alternar entre favorito e não favorito"
+                    >
+                      {(adoptionPending && !adoptionError) || (foundPending && !foundError) ? (
+                        <Loader size={16} />
+                      ) : (
+                        <HeartStraight
+                          style={{ width: rem(16), height: rem(16) }}
+                          weight={isFavorite ? "fill" : "regular"}
+                          color={theme.colors.red[6]}
+                        />
+                      )}
+                    </ActionIcon>
+                  </Tooltip>
+                ) : null}
+              </Group>
+            ) : null}
           </Group>
         </Card>
       </Link>
+      {userToMessage && (
+        <Chat
+          close={closeChat}
+          loading={loadingFirstPage}
+          userName={owner.fullName}
+          userId={owner.id}
+          messages={userMessages ?? []}
+          ref={ref}
+        />
+      )}
     </>
   );
 }

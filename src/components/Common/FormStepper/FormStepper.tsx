@@ -8,7 +8,7 @@ export type Step = {
   label: string;
   description: string;
   text?: string;
-  icon: JSX.Element;
+  icon?: JSX.Element;
 };
 
 interface FormStepperProps {

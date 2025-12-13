@@ -68,8 +68,14 @@ const Chat = forwardRef<HTMLDivElement, Readonly<ChatProps>>(
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
     const scrollToBottom = useCallback(() => {
-      messagesEndRef.current?.scrollIntoView();
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView();
+      }, 0);
     }, []);
+
+    useEffect(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [realTimeMessages]);
 
     const sendMessage = async () => {
       try {
@@ -162,17 +168,14 @@ const Chat = forwardRef<HTMLDivElement, Readonly<ChatProps>>(
       };
 
       if (scrollableElement) {
-        // Set initial scroll top and content height
         setScrollTop(scrollableElement.scrollTop);
         setContentHeight(scrollableElement.scrollHeight);
 
-        // Add scroll event listener
         scrollableElement.addEventListener("scroll", handleScroll);
       }
 
       return () => {
         if (scrollableElement) {
-          // Clean up the event listener on unmount
           scrollableElement.removeEventListener("scroll", handleScroll);
         }
       };
@@ -182,17 +185,14 @@ const Chat = forwardRef<HTMLDivElement, Readonly<ChatProps>>(
       const scrollableElement = (ref as React.RefObject<HTMLDivElement>).current;
 
       if (scrollableElement) {
-        // Only scroll if the content height increases
         const previousContentHeight = contentHeight;
         const newContentHeight = scrollableElement.scrollHeight;
 
-        // If new content is added at the top, adjust the scroll position
         if (newContentHeight > previousContentHeight) {
           const heightDifference = newContentHeight - previousContentHeight;
           scrollableElement.scrollTop = scrollTop + heightDifference + 40;
         }
 
-        // Update the content height
         setContentHeight(scrollableElement.scrollHeight);
       }
     }, [scrollTop, contentHeight, messages, ref]);
@@ -217,7 +217,7 @@ const Chat = forwardRef<HTMLDivElement, Readonly<ChatProps>>(
       return (
         <div className="w-screen h-screen md:w-96 md:h-96 bottom-0 fixed right-0 md:bottom-2 rounded bg-white overflow-y-scroll shadow z-50">
           <div
-            className="sticky top-0 z-50 flex items-center justify-between 
+            className="sticky top-0 z-50 flex items-center justify-between
           pt-1 mb-3 pl-5 pr-1 bg-[var(--primary-blue)]"
           >
             <Title order={6} c="white">
@@ -238,11 +238,11 @@ const Chat = forwardRef<HTMLDivElement, Readonly<ChatProps>>(
     return (
       <div
         ref={ref}
-        className="w-screen h-screen bottom-0 rounded-none mt-10 md:w-96 md:h-96 fixed right-0 md:bottom-2 
+        className="w-screen h-screen bottom-0 rounded-none mt-10 md:w-96 md:h-96 fixed right-0 md:bottom-2
           md:rounded bg-white overflow-y-scroll shadow z-[9999]"
       >
         <div
-          className="sticky top-0 z-50 flex items-center justify-between 
+          className="sticky top-0 z-50 flex items-center justify-between
           pt-1 mb-3 pl-5 pr-1 bg-[var(--primary-blue)]"
         >
           <Title order={6} c="white">
@@ -319,7 +319,7 @@ const Chat = forwardRef<HTMLDivElement, Readonly<ChatProps>>(
                 >
                   <PaperPlaneTilt size={16} className={messageInput ? "text-white" : "text-black"} />
                   <h3
-                    className={`text-xs font-semibold leading-4 px-2 
+                    className={`text-xs font-semibold leading-4 px-2
                   ${!messageInput ? "text-black" : "text-white"}`}
                   >
                     Enviar

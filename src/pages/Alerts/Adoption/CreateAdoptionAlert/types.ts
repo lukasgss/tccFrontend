@@ -21,37 +21,37 @@ export const alertDataSchema = z.object({
       "Apenas arquivos jpg, png e webp são aceitos.",
     ),
   existingImages: z.array(z.string().url()).optional(),
-  gender: z.string({ required_error: requiredFormFieldErrorMessage }).min(1, requiredFormFieldErrorMessage),
-  age: z.string({ required_error: requiredFormFieldErrorMessage }).min(1, requiredFormFieldErrorMessage),
-  colors: z.string({ required_error: requiredFormFieldErrorMessage }).array().nonempty({
+  gender: z.string({ message: requiredFormFieldErrorMessage }).min(1, requiredFormFieldErrorMessage),
+  age: z.string({ message: requiredFormFieldErrorMessage }).min(1, requiredFormFieldErrorMessage),
+  colors: z.string({ message: requiredFormFieldErrorMessage }).array().nonempty({
     message: requiredFormFieldErrorMessage,
   }),
-  isCastrated: z.string({ required_error: requiredFormFieldErrorMessage }).min(1, requiredFormFieldErrorMessage),
-  isVaccinated: z.string({ required_error: requiredFormFieldErrorMessage }).min(1, requiredFormFieldErrorMessage),
+  isCastrated: z.string({ message: requiredFormFieldErrorMessage }).min(1, requiredFormFieldErrorMessage),
+  isVaccinated: z.string({ message: requiredFormFieldErrorMessage }).min(1, requiredFormFieldErrorMessage),
   isNegativeToFivFelv: z.union([
-    z.string({ required_error: requiredFormFieldErrorMessage }).min(1, requiredFormFieldErrorMessage),
+    z.string({ message: requiredFormFieldErrorMessage }).min(1, requiredFormFieldErrorMessage),
     z.null(),
   ]),
   isNegativeToLeishmaniasis: z.union([
-    z.string({ required_error: requiredFormFieldErrorMessage }).min(1, requiredFormFieldErrorMessage),
+    z.string({ message: requiredFormFieldErrorMessage }).min(1, requiredFormFieldErrorMessage),
     z.null(),
   ]),
   breed: z
-    .string({ required_error: requiredFormFieldErrorMessage, invalid_type_error: requiredFormFieldErrorMessage })
+    .string({ message: requiredFormFieldErrorMessage, invalid_type_error: requiredFormFieldErrorMessage })
     .min(1, requiredFormFieldErrorMessage),
   species: z
-    .string({ required_error: requiredFormFieldErrorMessage, invalid_type_error: requiredFormFieldErrorMessage })
+    .string({ message: requiredFormFieldErrorMessage, invalid_type_error: requiredFormFieldErrorMessage })
     .min(1, requiredFormFieldErrorMessage),
   size: z
-    .string({ required_error: requiredFormFieldErrorMessage, invalid_type_error: requiredFormFieldErrorMessage })
+    .string({ message: requiredFormFieldErrorMessage, invalid_type_error: requiredFormFieldErrorMessage })
     .min(1, requiredFormFieldErrorMessage),
   description: z.string().max(1000, { message: "Máximo de 1000 caracteres permitidos." }).optional(),
   state: z
-    .string({ required_error: requiredFormFieldErrorMessage, invalid_type_error: requiredFormFieldErrorMessage })
+    .string({ message: requiredFormFieldErrorMessage, invalid_type_error: requiredFormFieldErrorMessage })
     .min(1, requiredFormFieldErrorMessage),
-  neighborhood: z.string({ required_error: requiredFormFieldErrorMessage }).min(1, requiredFormFieldErrorMessage),
+  neighborhood: z.string({ message: requiredFormFieldErrorMessage }).min(1, requiredFormFieldErrorMessage),
   city: z
-    .string({ required_error: requiredFormFieldErrorMessage, invalid_type_error: requiredFormFieldErrorMessage })
+    .string({ message: requiredFormFieldErrorMessage, invalid_type_error: requiredFormFieldErrorMessage })
     .min(1, requiredFormFieldErrorMessage),
   restrictions: z.array(z.string()).optional(),
   adoptionForm: z

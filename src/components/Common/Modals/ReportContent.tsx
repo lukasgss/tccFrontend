@@ -6,6 +6,7 @@ import { FormNotification } from "../Errors/FormMessage";
 import { ReportAdoptionAlert } from "../../../services/requests/Alerts/Adoption/adoptionAlertService";
 import getErrorMessage from "../../../utils/errorHandler";
 import { ReportMissingAlert } from "../../../services/requests/Alerts/Missing/missingAlertsService";
+import { ReportFoundAlert } from "../../../services/requests/Alerts/Found/foundAlertsService";
 
 function ReportIcon() {
   return (
@@ -105,6 +106,8 @@ export default function ReportContent({
       await ReportAdoptionAlert(alertId, reportReason);
     } else if (alertType === "missing") {
       await ReportMissingAlert(alertId, reportReason);
+    } else if (alertType === "found") {
+      await ReportFoundAlert(alertId, reportReason);
     }
   };
 
@@ -122,20 +125,26 @@ export default function ReportContent({
   });
 
   const getModalTitle = () => {
-    return alertType === "adoption" ? "Denunciar adoção" : "Denunciar alerta de desaparecimento";
+    if (alertType === "adoption") {
+      return "Denunciar adoção";
+    }
+    if (alertType === "missing") {
+      return "Denunciar alerta de desaparecimento";
+    }
+    if (alertType === "found") {
+      return "Denunciar alerta de animal encontrado";
+    }
+    return "Denunciar alerta";
   };
 
   return (
     <div className="relative transform overflow-hidden text-left transition-all sm:w-full sm:max-w-lg pt-4">
       <div className="p-2 pb-4">
-        <div className="relative flex items-center justify-start">
-          <div
-            className="mx-auto absolute p-1 flex flex-shrink-0 items-center justify-center
-          rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10"
-          >
+        <div className="flex items-center gap-3">
+          <div className="flex flex-shrink-0 items-center justify-center rounded-full bg-red-100 h-10 w-10">
             <ReportIcon />
           </div>
-          <div className="flex-1 flex justify-center text-center sm:ml-4 sm:mt-0 sm:text-left">
+          <div className="flex-1">
             <Title order={4} className="font-semibold leading-6 text-gray-900" id="modal-title">
               {getModalTitle()}
             </Title>

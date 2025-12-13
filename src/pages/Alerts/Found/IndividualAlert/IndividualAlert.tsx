@@ -1,11 +1,11 @@
-import { Badge, Button, Divider, em, Modal, Text, Title, Tooltip, useMantineTheme } from "@mantine/core";
+import { Badge, Button, Divider, em, Modal, Text, Title, useMantineTheme } from "@mantine/core";
 import { useDisclosure, useMediaQuery } from "@mantine/hooks";
-import { CalendarDots, CheckCircle, MapPin as MapPinIcon, Pencil } from "@phosphor-icons/react";
+import { CalendarDots, CheckCircle, MapPin as MapPinIcon } from "@phosphor-icons/react";
 import { IconFlag } from "@tabler/icons-react";
 import { useMutation } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { useContext, useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import ConversationsSidebar from "../../../../components/Chat/components/ConversationSidebar";
 import AlertCarousel from "../../../../components/Common/Carousel/AlertCarousel/AlertCarousel";
 import ModalCarousel from "../../../../components/Common/Carousel/ModalCarousel/ModalCarousel";
@@ -97,6 +97,7 @@ export default function IndividualFoundAnimalAlert() {
       images: data.pet.images,
       gender: data.pet.gender,
       breed: data.pet.breed,
+      ownerId: data.owner.id,
     };
 
     const recentlyViewedPets = JSON.parse(localStorage.getItem("recentlyViewedAlerts") || "[]");
@@ -117,13 +118,13 @@ export default function IndividualFoundAnimalAlert() {
 
   const displayName = data.name || "Animal sem nome";
   const displayGender = data.pet.gender?.name || "Desconhecido";
-  const displayBreed = data.pet.breed?.name || data.pet.age.name;
+  const displayBreed = data.pet.breed?.name || "Desconhecido";
 
   const animalCharacteristics: AnimalCharacteristics = {
     leftSection: [
       {
         name: "Espécie",
-        value: data.pet.age.name,
+        value: data.pet.species.name,
       },
       {
         name: "Raça",
@@ -137,11 +138,11 @@ export default function IndividualFoundAnimalAlert() {
     rightSection: [
       {
         name: "Idade aproximada",
-        value: data.pet.age.name,
+        value: data.pet.age?.name || "Desconhecida",
       },
       {
         name: "Porte",
-        value: data.pet.age.name,
+        value: data.pet.size?.name || "Desconhecido",
       },
       {
         name: "Cores",
@@ -223,17 +224,7 @@ export default function IndividualFoundAnimalAlert() {
                     </Button>
                   ) : null}
 
-                  {isOwnerOfAlert && (
-                    <Link to={`/encontrados/editar/${alertId}`}>
-                      <Tooltip label="Editar" className="w-fit">
-                        <Button className="w-fit p-0.5" variant="subtle">
-                          <Pencil weight="duotone" className="text-[#4d4751]" size={30} />
-                        </Button>
-                      </Tooltip>
-                    </Link>
-                  )}
-
-                  <ShareButton petName={displayName} petGender={data.pet.gender.name} />
+                  <ShareButton type="found" petName={displayName} petGender={data.pet.gender?.name ?? null} />
 
                   <OtherOptionsButton items={otherOptionItems} loading={false} />
                 </div>
@@ -277,10 +268,11 @@ export default function IndividualFoundAnimalAlert() {
             <div className={`flex gap-1.5 ${isPetRecovered() ? "mt-1" : "mt-2 md:mt-3"}`}>
               <MapPinIcon size={20} />
               <span>
-                Encontrado em{" "}
-                {data.foundLocationLatitude && data.foundLocationLongitude
-                  ? "localização marcada no mapa"
-                  : "localização não especificada"}
+                {data.geoLocation?.city && data.geoLocation?.state ? (
+                  <span>{`${data.geoLocation.city.text}, ${data.geoLocation.state.text}`}</span>
+                ) : (
+                  <span>Localização não encontrada</span>
+                )}
               </span>
             </div>
 
@@ -339,7 +331,7 @@ export default function IndividualFoundAnimalAlert() {
                 <div>
                   <PetCharacteristic
                     characteristic="Bairro"
-                    value={data.geoLocation?.neighborhood || "Não informado"}
+                    value={data.neighborhood || data.geoLocation?.neighborhood || "Não informado"}
                   />
                   <PetCharacteristic characteristic="Estado" value={data.geoLocation?.state.text || "Não informado"} />
                 </div>

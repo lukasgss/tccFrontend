@@ -2,17 +2,18 @@ import { ActionIcon, Button, Menu, Tooltip } from "@mantine/core";
 import { ShareNetwork } from "@phosphor-icons/react";
 import { useLocation } from "react-router-dom";
 import ShareDropdown from "../../../../../components/Common/Share/ShareDropdown";
-import { Gender } from "../../../../../services/requests/Pets/types";
-import { getAdoptionAlertWhatsappMessage, getShareAdoptionAlertMessage } from "../../../../../utils/shareContent";
+import { getAlertWhatsappMessage, getShareAlertMessage } from "../../../../../utils/shareContent";
+import { AlertTypes } from "../../../../Home/components/AlertCard";
 
 interface ShareButtonProps {
+  type: AlertTypes;
   petName: string;
-  petGender: Gender;
+  petGender: string | null;
 }
 
 const { VITE_APP_BASE_URL } = import.meta.env;
 
-export default function ShareButton({ petName, petGender }: Readonly<ShareButtonProps>) {
+export default function ShareButton({ type, petName, petGender }: Readonly<ShareButtonProps>) {
   const location = useLocation();
 
   const alertUrl = `${VITE_APP_BASE_URL}${location.pathname}`;
@@ -20,7 +21,7 @@ export default function ShareButton({ petName, petGender }: Readonly<ShareButton
   const handleShareMobile = () => {
     navigator.share({
       title: "Conferir adoção",
-      text: getShareAdoptionAlertMessage(petGender.name, petName),
+      text: getShareAlertMessage(type, petGender, petName),
       url: alertUrl,
     });
   };
@@ -37,8 +38,8 @@ export default function ShareButton({ petName, petGender }: Readonly<ShareButton
         </Menu.Target>
         <Menu.Dropdown className="shadow">
           <ShareDropdown
-            whatsappMessage={getAdoptionAlertWhatsappMessage(petGender.name, petName, alertUrl)}
-            twitterMessage={getShareAdoptionAlertMessage(petGender.name, petName)}
+            whatsappMessage={getAlertWhatsappMessage(type, petGender, petName, alertUrl)}
+            twitterMessage={getShareAlertMessage(type, petGender, petName)}
           />
         </Menu.Dropdown>
       </Menu>

@@ -52,9 +52,11 @@ export default function SuggestedAdoptionAlerts() {
                       type="adoption"
                       alertId={alert.id}
                       name={alert.pet.name}
-                      breed={alert.pet.breed.name}
-                      gender={alert.pet.gender.name}
+                      breed={alert.pet.breed?.name || "Raça desconhecida"}
+                      gender={alert.pet.gender?.name || "Desconhecido"}
                       image={alert.pet.images[0]}
+                      isFavorite={alert.isFavorite}
+                      ownerId={alert.owner.id}
                     />
                   </Grid.Col>
                 ))}

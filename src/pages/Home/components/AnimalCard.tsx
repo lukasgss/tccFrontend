@@ -21,8 +21,10 @@ interface AnimalCardProps {
 }
 
 const searchAlertSchema = z.object({
-  alertType: z.string({ required_error: requiredFormFieldErrorMessage }).min(1, requiredFormFieldErrorMessage),
-  city: z.string({ required_error: requiredFormFieldErrorMessage }).min(1, requiredFormFieldErrorMessage),
+  alertType: z.enum(["adoption", "missing", "found"], {
+    message: requiredFormFieldErrorMessage,
+  }),
+  city: z.string({ message: requiredFormFieldErrorMessage }).min(1, requiredFormFieldErrorMessage),
 });
 
 type SearchAlertForm = z.infer<typeof searchAlertSchema>;
@@ -35,7 +37,15 @@ export default function AnimalCard({ animalCard, setAnimalCard }: Readonly<Anima
       label: "Animais para adoção",
       value: "adoption",
     },
-  ];
+    {
+      label: "Animais perdidos",
+      value: "missing",
+    },
+    {
+      label: "Animais encontrados",
+      value: "found",
+    },
+  ] as const;
 
   const {
     register,
@@ -45,13 +55,21 @@ export default function AnimalCard({ animalCard, setAnimalCard }: Readonly<Anima
     handleSubmit,
   } = useForm<SearchAlertForm>({
     defaultValues: {
-      alertType: alertTypesData[0].value,
+      alertType: alertTypesData[0].value as "adoption" | "missing" | "found",
     },
     resolver: zodResolver(searchAlertSchema),
   });
 
   const generateNavigationUrl = (navigationData: NavigationData) => {
-    return `/adocoes?city=${navigationData.city}&speciesId=${navigationData.speciesId}`;
+    const alertType = getValues("alertType");
+    if (alertType === "adoption") {
+      return `/adocoes?city=${navigationData.city}&speciesId=${navigationData.speciesId}`;
+    }
+    if (alertType === "found") {
+      return `/encontrados?city=${navigationData.city}&speciesId=${navigationData.speciesId}`;
+    }
+
+    return `/perdidos?city=${navigationData.city}&speciesId=${navigationData.speciesId}`;
   };
 
   const onSubmit = handleSubmit(() => {

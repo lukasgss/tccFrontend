@@ -7,7 +7,6 @@ import { Control, Controller, FieldError, Merge, UseFormSetValue } from "react-h
 
 import { bytesFormatter } from "../../../../utils/formatters";
 import AttachmentFile from "../../File/AttachmentFile";
-import classes from "./InputDropzone.module.css";
 
 interface InputDropzoneProps {
   control: Control<any>;
@@ -101,7 +100,7 @@ export default function InputDropzone({
   };
 
   return (
-    <div className={classes.wrapper}>
+    <div>
       <div className="flex items-center gap-1.5">
         <Title order={4}>{label}</Title>
         {required && (
@@ -135,7 +134,7 @@ export default function InputDropzone({
               }
               setInvalidError(false);
             }}
-            className={`${classes.dropzone} ${error ? "border border-[var(--mantine-color-error)]" : ""}`}
+            className={`border border-dashed rounded-md p-6 ${error ? "border-[var(--mantine-color-error)]" : "border-gray-300"}`}
             radius="md"
             accept={
               isImage
@@ -149,7 +148,7 @@ export default function InputDropzone({
                 <Dropzone.Accept>
                   <IconDownload
                     style={{ width: rem(50), height: rem(50) }}
-                    color={theme.colors["brand-blue"][6]}
+                    color={theme.colors["brand-blue"]?.[6] ?? theme.colors.blue[6]}
                     stroke={1.5}
                   />
                 </Dropzone.Accept>
@@ -160,7 +159,7 @@ export default function InputDropzone({
                   <IconCloudUpload
                     style={{ width: rem(50), height: rem(50) }}
                     stroke={1.5}
-                    color={error ? theme.colors.red[6] : theme.colors["brand-blue"][6]}
+                    color={error ? theme.colors.red[6] : theme.colors["brand-blue"]?.[6] ?? theme.colors.blue[6]}
                   />
                 </Dropzone.Idle>
               </Group>
@@ -187,136 +186,127 @@ export default function InputDropzone({
         </Text>
       )}
       <div className="flex justify-center mt-4">
-        <Button className={classes.control} size="md" radius="xl" onClick={() => openRef.current?.()}>
+        <Button size="md" radius="xl" onClick={() => openRef.current?.()}>
           Adicionar arquivo
         </Button>
       </div>
 
       <div className="flex flex-wrap gap-x-8 gap-y-0 mt-14">
         {alreadyExistingFiles?.map((file) => (
-          <div className={`relative ${isImage ? "w-[300px] h-[300px]" : ""} object-cover mb-6`} key={file}>
+          <div
+            className={`relative mb-6 ${isImage ? "w-[300px] h-[300px] overflow-hidden rounded border-2 border-zinc-200" : ""}`}
+            key={file}
+          >
             <UnstyledButton className="absolute top-1 right-1 z-10" onClick={() => removeExistingFile(file)}>
               <Tooltip label={isImage ? "Remover imagem" : "Remover arquivo"}>
                 <XCircle size={24} className="text-[var(--mantine-color-error)] bg-zinc-100 rounded-full" />
               </Tooltip>
             </UnstyledButton>
             {isImage ? (
-              <Image
-                src={file}
-                draggable={false}
-                className="rounded border-2 border-zinc-200 h-full w-full object-cover"
-              />
+              <Image src={file} draggable={false} className="h-full w-full object-cover" />
             ) : (
               <AttachmentFile file={file} fileName={existingFileName} />
             )}
           </div>
         ))}
 
-        {Array.isArray(files) ? (
-          files.map((file, idx) => {
-            const fileUrl = URL.createObjectURL(file);
-            return (
-              <div
-                className={`relative flex items-center object-cover mb-6 ${
-                  isImage
-                    ? "w-[300px] h-[300px]"
-                    : "h-28 w-72 shadow-[0px_2px_1px_-1px_rgba(0,0,0,0.2),0px_1px_1px_0px_rgba(0,0,0,0.14),0px_1px_3px_0px_rgba(0,0,0,0.12)] rounded"
-                }`}
-                // eslint-disable-next-line react/no-array-index-key
-                key={`${file.name}-${idx}`}
-              >
-                <UnstyledButton className="absolute top-1 right-1">
-                  <Tooltip label={isImage ? "Remover imagem" : "Remover arquivo"}>
-                    <XCircle
-                      size={24}
-                      onClick={() => removeAddedFile(file.name)}
-                      className="text-[var(--mantine-color-error)] bg-zinc-100 rounded-full"
+        {Array.isArray(files)
+          ? files.map((file, idx) => {
+              const fileUrl = URL.createObjectURL(file);
+              return (
+                <div
+                  className={`relative mb-6 ${
+                    isImage
+                      ? "w-[300px] h-[300px] overflow-hidden rounded border-2 border-zinc-200"
+                      : "flex items-center h-28 w-72 shadow-[0px_2px_1px_-1px_rgba(0,0,0,0.2),0px_1px_1px_0px_rgba(0,0,0,0.14),0px_1px_3px_0px_rgba(0,0,0,0.12)] rounded"
+                  }`}
+                  // eslint-disable-next-line react/no-array-index-key
+                  key={`${file.name}-${idx}`}
+                >
+                  <UnstyledButton className="absolute top-1 right-1 z-10" onClick={() => removeAddedFile(file.name)}>
+                    <Tooltip label={isImage ? "Remover imagem" : "Remover arquivo"}>
+                      <XCircle size={24} className="text-[var(--mantine-color-error)] bg-zinc-100 rounded-full" />
+                    </Tooltip>
+                  </UnstyledButton>
+                  {isImage ? (
+                    <Image
+                      src={fileUrl}
+                      onLoad={() => URL.revokeObjectURL(fileUrl)}
+                      draggable={false}
+                      className="h-full w-full object-cover"
                     />
+                  ) : (
+                    <div className="flex items-center gap-3 px-2 truncate">
+                      <div
+                        className="flex items-center justify-center min-h-[90px] min-w-[90px]
+                    bg-[#f3f5f7] border-[#CFD2D4] border"
+                      >
+                        <div className="flex flex-col items-center">
+                          <File size={38} />
+                          <Text size="sm" className="opacity-80">
+                            {file.name.split(".").pop()}
+                          </Text>
+                        </div>
+                      </div>
+                      <div className="flex flex-col truncate">
+                        <Tooltip label={file.name}>
+                          <Text className="truncate">{file.name}</Text>
+                        </Tooltip>
+                        <Text size="sm" className="opacity-70">
+                          {bytesFormatter(file.size)}
+                        </Text>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })
+          : files.name && (
+              <div
+                className={`relative mb-6 ${
+                  isImage
+                    ? "w-[300px] h-[300px] overflow-hidden rounded border-2 border-zinc-200"
+                    : "flex items-center h-28 w-72 shadow-[0px_2px_1px_-1px_rgba(0,0,0,0.2),0px_1px_1px_0px_rgba(0,0,0,0.14),0px_1px_3px_0px_rgba(0,0,0,0.12)] rounded"
+                }`}
+                key={files.name}
+              >
+                <UnstyledButton className="absolute top-1 right-1 z-10" onClick={() => removeAddedFile(files.name)}>
+                  <Tooltip label={isImage ? "Remover imagem" : "Remover arquivo"}>
+                    <XCircle size={24} className="text-[var(--mantine-color-error)] bg-zinc-100 rounded-full" />
                   </Tooltip>
                 </UnstyledButton>
                 {isImage ? (
                   <Image
-                    src={fileUrl}
-                    onLoad={() => URL.revokeObjectURL(fileUrl)}
+                    src={URL.createObjectURL(files)}
+                    onLoad={() => URL.revokeObjectURL(URL.createObjectURL(files))}
                     draggable={false}
-                    className="rounded border-2 border-zinc-200 h-full w-full object-cover"
+                    className="h-full w-full object-cover"
                   />
                 ) : (
                   <div className="flex items-center gap-3 px-2 truncate">
                     <div
-                      className="flex items-center justify-center min-h-[90px] min-w-[90px] 
+                      className="flex items-center justify-center min-h-[90px] min-w-[90px]
                     bg-[#f3f5f7] border-[#CFD2D4] border"
                     >
                       <div className="flex flex-col items-center">
                         <File size={38} />
                         <Text size="sm" className="opacity-80">
-                          {file.name.split(".").pop()}
+                          {files.name.split(".").pop()}
                         </Text>
                       </div>
                     </div>
                     <div className="flex flex-col truncate">
-                      <Tooltip label={file.name}>
-                        <Text className="truncate">{file.name}</Text>
+                      <Tooltip label={files.name}>
+                        <Text className="truncate">{files.name}</Text>
                       </Tooltip>
                       <Text size="sm" className="opacity-70">
-                        {bytesFormatter(file.size)}
+                        {bytesFormatter(files.size)}
                       </Text>
                     </div>
                   </div>
                 )}
               </div>
-            );
-          })
-        ) : (
-          <div
-            className={`relative flex items-center object-cover mb-6 ${
-              isImage
-                ? "w-[300px] h-[300px]"
-                : "h-28 w-72 shadow-[0px_2px_1px_-1px_rgba(0,0,0,0.2),0px_1px_1px_0px_rgba(0,0,0,0.14),0px_1px_3px_0px_rgba(0,0,0,0.12)] rounded"
-            }`}
-            key={files.name}
-          >
-            <UnstyledButton className="absolute top-1 right-1">
-              <Tooltip label={isImage ? "Remover imagem" : "Remover arquivo"}>
-                <XCircle
-                  size={24}
-                  onClick={() => removeAddedFile(files.name)}
-                  className="text-[var(--mantine-color-error)] bg-zinc-100 rounded-full"
-                />
-              </Tooltip>
-            </UnstyledButton>
-            {isImage ? (
-              <Image
-                src={URL.createObjectURL(files)}
-                onLoad={() => URL.revokeObjectURL(URL.createObjectURL(files))}
-                draggable={false}
-                className="rounded border-2 border-zinc-200 h-full w-full object-cover"
-              />
-            ) : (
-              <div className="flex items-center gap-3 px-2 truncate">
-                <div
-                  className="flex items-center justify-center min-h-[90px] min-w-[90px] 
-                    bg-[#f3f5f7] border-[#CFD2D4] border"
-                >
-                  <div className="flex flex-col items-center">
-                    <File size={38} />
-                    <Text size="sm" className="opacity-80">
-                      {files.name.split(".").pop()}
-                    </Text>
-                  </div>
-                </div>
-                <div className="flex flex-col truncate">
-                  <Tooltip label={files.name}>
-                    <Text className="truncate">{files.name}</Text>
-                  </Tooltip>
-                  <Text size="sm" className="opacity-70">
-                    {bytesFormatter(files.size)}
-                  </Text>
-                </div>
-              </div>
             )}
-          </div>
-        )}
       </div>
     </div>
   );

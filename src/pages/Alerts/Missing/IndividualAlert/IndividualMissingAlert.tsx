@@ -1,11 +1,11 @@
-import { Badge, Button, Divider, em, Modal, Text, Title, Tooltip, useMantineTheme } from "@mantine/core";
+import { Badge, Button, Divider, em, Modal, Text, Title, useMantineTheme } from "@mantine/core";
 import { useDisclosure, useMediaQuery } from "@mantine/hooks";
-import { CalendarDots, Confetti, HeartStraight, Pencil } from "@phosphor-icons/react";
+import { CalendarDots, Confetti, HeartStraight } from "@phosphor-icons/react";
 import { IconFlag, IconMapPin } from "@tabler/icons-react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { useContext, useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import ConversationsSidebar from "../../../../components/Chat/components/ConversationSidebar";
 import AlertCarousel from "../../../../components/Common/Carousel/AlertCarousel/AlertCarousel";
 import ModalCarousel from "../../../../components/Common/Carousel/ModalCarousel/ModalCarousel";
@@ -59,6 +59,7 @@ export default function IndividualMissingAlert() {
 
   const { isAuthenticated, userData } = useContext(AuthContext);
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const theme = useMantineTheme();
 
@@ -71,6 +72,10 @@ export default function IndividualMissingAlert() {
 
   const { mutateAsync: toggleMissingAlertFavoriteAsync } = useMutation({
     mutationFn: () => ToggleMissingAlertFavorite(data!.id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["userSavedAlerts"] });
+      queryClient.invalidateQueries({ queryKey: ["suggestedAlerts"] });
+    },
     onError: (e) => {
       const error = e as AxiosError<ApiError>;
       Notify({ type: "error", message: error.response?.data.message ?? defaultFormErrorMessage });
@@ -126,6 +131,7 @@ export default function IndividualMissingAlert() {
       images: data.pet.images,
       gender: data.pet.gender,
       breed: data.pet.breed,
+      ownerId: data.owner.id,
     };
 
     const recentlyViewedPets = JSON.parse(localStorage.getItem("recentlyViewedAlerts") || "[]");
@@ -160,11 +166,11 @@ export default function IndividualMissingAlert() {
       },
       {
         name: "Raça",
-        value: data.pet.breed.name,
+        value: data.pet.breed?.name || "Desconhecida",
       },
       {
         name: "Sexo",
-        value: data.pet.gender.name,
+        value: data.pet.gender?.name || "Desconhecido",
       },
       {
         name: "Castrado",
@@ -180,11 +186,11 @@ export default function IndividualMissingAlert() {
     rightSection: [
       {
         name: "Idade",
-        value: data.pet.age.name,
+        value: data.pet.age?.name || "Desconhecida",
       },
       {
         name: "Porte",
-        value: data.pet.size.name,
+        value: data.pet.size?.name || "Desconhecido",
       },
       {
         name: "Cores",
@@ -238,7 +244,7 @@ export default function IndividualMissingAlert() {
       <main className="relative">
         <MetaTags
           title={`${data.pet.name} está desaparecido | AcheMeuPet`}
-          description={`Ajude a encontrar ${data.pet.name}, ${data.pet.gender.name === "Macho" ? "um" : "uma"} ${data.pet.species.name.toLowerCase()} desaparecido. Se você viu ${data.pet.gender.name === "Macho" ? "este" : "esta"} pet, entre em contato através do AcheMeuPet.`}
+          description={`Ajude a encontrar ${data.pet.name}, ${data.pet.gender?.name === "Macho" ? "um" : data.pet.gender?.name === "Fêmea" ? "uma" : "um"} ${data.pet.species.name.toLowerCase()} desaparecido. Se você viu ${data.pet.gender?.name === "Macho" ? "este" : data.pet.gender?.name === "Fêmea" ? "esta" : "este"} pet, entre em contato através do AcheMeuPet.`}
           keywords="pet perdido, animal desaparecido, encontrar pet, pets perdidos, AcheMeuPet, resgate animal"
         />
         <Header />
@@ -285,17 +291,7 @@ export default function IndividualMissingAlert() {
                     </Button>
                   ) : null}
 
-                  {isOwnerOfAlert && (
-                    <Link to={`/desaparecidos/editar/${alertId}`}>
-                      <Tooltip label="Editar" className="w-fit">
-                        <Button className="w-fit p-0.5" variant="subtle">
-                          <Pencil weight="duotone" className="text-[#4d4751]" size={30} />
-                        </Button>
-                      </Tooltip>
-                    </Link>
-                  )}
-
-                  <ShareButton petName={data.pet.name} petGender={data.pet.gender} />
+                  <ShareButton petName={data.pet.name} petGender={data.pet.gender?.name ?? null} />
 
                   <OtherOptionsButton items={getOtherOptionsItems()} />
                 </div>
@@ -333,7 +329,11 @@ export default function IndividualMissingAlert() {
               <div className="flex gap-1.5 mt-2 md:mt-3 mb-0.5">
                 <CalendarDots size={20} />
                 <span>
-                  {data.pet.gender.id === GenderEnum.Male ? "Encontrado em" : "Encontrada em"}{" "}
+                  {data.pet.gender?.id === GenderEnum.Male
+                    ? "Encontrado em"
+                    : data.pet.gender?.id === GenderEnum.Female
+                      ? "Encontrada em"
+                      : "Encontrado em"}{" "}
                   {formatDateOnly(data.recoveryDate)}
                 </span>
               </div>
@@ -401,21 +401,13 @@ export default function IndividualMissingAlert() {
 
               <div className="mt-5 flex flex-col sm:flex-row sm:gap-28">
                 <div>
-                  <PetCharacteristic characteristic="Bairro" value={data.neighborhood} />
+                  <PetCharacteristic characteristic="Bairro" value={data.geoLocation?.neighborhood} />
                   <PetCharacteristic characteristic="Estado" value={data.geoLocation?.state.text} />
                 </div>
                 <div>
                   <PetCharacteristic characteristic="Cidade" value={data.geoLocation?.city.text} />
                 </div>
               </div>
-            </div>
-
-            <div className="mt-5">
-              <Divider size="md" my="xs" color={theme.colors["brand-blue"][6]} />
-              <Title order={3} className="uppercase mb-1.5">
-                Data de registro
-              </Title>
-              <Text>{formatDateOnly(data.registrationDate)}</Text>
             </div>
           </div>
           {!isOwnerOfAlert ? (

@@ -17,7 +17,7 @@ import { IconMessage, IconShare } from "@tabler/icons-react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { HeartStraight } from "@phosphor-icons/react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useContext, useRef, useState } from "react";
 import classes from "./AlertCard.module.css";
 
@@ -28,11 +28,12 @@ import { ToggleAdoptionAlertFavorite } from "../../../../services/requests/Alert
 import { PetResponseNoOwner } from "../../../../services/requests/Pets/types";
 import { UserDataOnlyResponse } from "../../../../services/requests/User/types";
 import getErrorMessage from "../../../../utils/errorHandler";
-import { getAdoptionAlertWhatsappMessage, getShareAdoptionAlertMessage } from "../../../../utils/shareContent";
 import Chat from "../../../Chat/Chat";
 import ShareDropdown from "../../Share/ShareDropdown";
 import { AlertTypes } from "../../../../pages/Home/components/AlertCard";
 import { ToggleFoundAlertFavorite } from "../../../../services/requests/Alerts/Found/foundAlertsService";
+import { ToggleMissingAlertFavorite } from "../../../../services/requests/Alerts/Missing/missingAlertsService";
+import { getAlertWhatsappMessage, getShareAlertMessage } from "../../../../utils/shareContent";
 
 interface AlertCardProps {
   type: AlertTypes;
@@ -58,6 +59,7 @@ export default function AlertCard({
   const theme = useMantineTheme();
   const navigate = useNavigate();
   const { isAuthenticated, userData } = useContext(AuthContext);
+  const queryClient = useQueryClient();
 
   const [userToMessage, setUserToMessage] = useState<UserDataOnlyResponse | null>(null);
 
@@ -67,7 +69,11 @@ export default function AlertCard({
     isError: adoptionError,
   } = useMutation({
     mutationFn: () => ToggleAdoptionAlertFavorite(alertId),
-    onSuccess: () => toggleAlertFavorite?.(alertId),
+    onSuccess: () => {
+      toggleAlertFavorite?.(alertId);
+      queryClient.invalidateQueries({ queryKey: ["userSavedAlerts"] });
+      queryClient.invalidateQueries({ queryKey: ["suggestedAlerts"] });
+    },
     onError: (e) => {
       const errorMessage = getErrorMessage(e);
       Notify({ type: "error", message: errorMessage });
@@ -80,7 +86,28 @@ export default function AlertCard({
     isError: foundError,
   } = useMutation({
     mutationFn: () => ToggleFoundAlertFavorite(alertId),
-    onSuccess: () => toggleAlertFavorite?.(alertId),
+    onSuccess: () => {
+      toggleAlertFavorite?.(alertId);
+      queryClient.invalidateQueries({ queryKey: ["userSavedAlerts"] });
+      queryClient.invalidateQueries({ queryKey: ["suggestedAlerts"] });
+    },
+    onError: (e) => {
+      const errorMessage = getErrorMessage(e);
+      Notify({ type: "error", message: errorMessage });
+    },
+  });
+
+  const {
+    mutateAsync: toggleMissingAlertFavoriteAsync,
+    isPending: missingPending,
+    isError: missingError,
+  } = useMutation({
+    mutationFn: () => ToggleMissingAlertFavorite(alertId),
+    onSuccess: () => {
+      toggleAlertFavorite?.(alertId);
+      queryClient.invalidateQueries({ queryKey: ["userSavedAlerts"] });
+      queryClient.invalidateQueries({ queryKey: ["suggestedAlerts"] });
+    },
     onError: (e) => {
       const errorMessage = getErrorMessage(e);
       Notify({ type: "error", message: errorMessage });
@@ -92,12 +119,15 @@ export default function AlertCard({
 
     if (!isAuthenticated) {
       navigate("/login");
+      return;
     }
 
     if (type === "adoption") {
       await toggleAdoptionAlertFavoriteAsync();
     } else if (type === "found") {
       await toggleFoundAlertFavoriteAsync();
+    } else if (type === "missing") {
+      await toggleMissingAlertFavoriteAsync();
     }
   }
 
@@ -142,16 +172,19 @@ export default function AlertCard({
             />
           </Card.Section>
 
-          <Tooltip label={pet.name}>
+          <Tooltip label={pet.name || "Animal sem nome"}>
             <Title fw={500} order={3} className={`${classes.title} truncate`}>
-              {pet.name}
+              {pet.name || "Animal sem nome"}
             </Title>
           </Tooltip>
 
-          <Tooltip label={`${pet.gender.name} · ${pet.age.name} · ${pet.breed.name}`}>
+          <Tooltip
+            label={`${pet.gender?.name || "Gênero desconhecido"} · ${pet.age?.name || "Idade desconhecida"} · ${pet.breed?.name || "Raça desconhecida"}`}
+          >
             <Text ta="center" className="truncate">
-              {pet.gender.name} <span className="text-black">·</span> {pet.age.name}
-              <span className="text-black"> ·</span> {pet.breed.name}
+              {pet.gender?.name || "Gênero desconhecido"} <span className="text-black">·</span>{" "}
+              {pet.age?.name || "Idade desconhecida"}
+              <span className="text-black"> ·</span> {pet.breed?.name || "Raça desconhecida"}
             </Text>
           </Tooltip>
 
@@ -192,8 +225,8 @@ export default function AlertCard({
                   </Menu.Target>
                   <Menu.Dropdown className="shadow">
                     <ShareDropdown
-                      whatsappMessage={getAdoptionAlertWhatsappMessage(pet.gender.name, pet.name, alertUrl)}
-                      twitterMessage={getShareAdoptionAlertMessage(pet.gender.name, pet.name)}
+                      whatsappMessage={getAlertWhatsappMessage(type, pet.gender?.name ?? null, pet.name, alertUrl)}
+                      twitterMessage={getShareAlertMessage(type, pet.gender?.name ?? null, pet.name)}
                     />
                   </Menu.Dropdown>
                 </Menu>
@@ -205,7 +238,9 @@ export default function AlertCard({
                       onClick={(e) => handleFavoriteAlert(e)}
                       aria-label="Alternar entre favorito e não favorito"
                     >
-                      {(adoptionPending && !adoptionError) || (foundPending && !foundError) ? (
+                      {(adoptionPending && !adoptionError) ||
+                      (foundPending && !foundError) ||
+                      (missingPending && !missingError) ? (
                         <Loader size={16} />
                       ) : (
                         <HeartStraight

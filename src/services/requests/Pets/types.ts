@@ -5,7 +5,7 @@ export interface Pet {
   id: string;
   name: string;
   observations: string | null;
-  gender: Gender;
+  gender: Gender | null;
   age: string;
   size: string;
   images: string[];
@@ -40,7 +40,7 @@ export interface Size {
 export interface PetResponse {
   id: string;
   name: string;
-  gender: Gender;
+  gender: Gender | null;
   age: Age;
   images: string[];
   owner: OwnerResponse;
@@ -52,13 +52,13 @@ export interface PetResponse {
 export interface PetResponseNoOwner {
   id: string;
   name: string;
-  gender: Gender;
-  age: Age;
-  size: Size;
+  gender: Gender | null;
+  age: Age | null;
+  size: Size | null;
   images: string[];
   colors: ColorResponse[];
   species: SpeciesResponse;
-  breed: BreedResponse;
+  breed: BreedResponse | null;
   isCastrated: boolean | undefined;
   isVaccinated: boolean | undefined;
   isNegativeToFivFelv: boolean | undefined;
@@ -69,7 +69,7 @@ export interface SimplifiedPetResponse {
   id: string;
   name: string;
   observations?: string;
-  gender: Gender;
+  gender: Gender | null;
   age: string;
   size: string;
   images: string[];
@@ -115,6 +115,7 @@ export interface RecentlyViewedPet {
   id: string;
   name: string;
   images: string[];
-  gender: Gender;
-  breed: BreedResponse;
+  gender: Gender | null;
+  breed: BreedResponse | null;
+  ownerId: string;
 }

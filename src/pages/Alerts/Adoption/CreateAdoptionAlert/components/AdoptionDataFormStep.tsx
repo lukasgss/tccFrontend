@@ -115,6 +115,7 @@ export default function AdoptionDataFormStep({
             name="neighborhood"
             placeholder="Savassi"
             error={errors.neighborhood}
+            required
           />
         </div>
 

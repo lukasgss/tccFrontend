@@ -26,7 +26,7 @@ export async function GetMissingAlertById(alertId: string): Promise<MissingAlert
 }
 
 export async function ToggleMissingAlertFavorite(alertId: string): Promise<void> {
-  await API.post(`/missing-alerts/favorite/${alertId}`);
+  await API.post(`/favorite/missing/${alertId}`);
 }
 
 export async function ToggleMissingAlertRecovery(alertId: string): Promise<void> {

@@ -1,6 +1,5 @@
 import { Menu, useMantineTheme } from "@mantine/core";
 import { IconBrandFacebook, IconBrandWhatsapp, IconBrandX } from "@tabler/icons-react";
-import { FacebookProvider, ShareButton as FbShareButton } from "react-facebook";
 import { useLocation } from "react-router-dom";
 
 interface ShareDropdownProps {
@@ -8,7 +7,7 @@ interface ShareDropdownProps {
   twitterMessage: string;
 }
 
-const { VITE_FACEBOOK_APP_ID, VITE_APP_BASE_URL } = import.meta.env;
+const { VITE_APP_BASE_URL } = import.meta.env;
 
 export default function ShareDropdown({ whatsappMessage, twitterMessage }: Readonly<ShareDropdownProps>) {
   const theme = useMantineTheme();
@@ -28,11 +27,16 @@ export default function ShareDropdown({ whatsappMessage, twitterMessage }: Reado
           Compartilhar no WhatsApp
         </Menu.Item>
       </a>
-      <FacebookProvider appId={VITE_FACEBOOK_APP_ID}>
-        <FbShareButton href={alertUrl} display="popup">
-          <Menu.Item leftSection={<IconBrandFacebook size={28} color="#00ACEE" />}>Compartilhar no Facebook</Menu.Item>
-        </FbShareButton>
-      </FacebookProvider>
+      <a
+        href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(alertUrl)}`}
+        target="_blank"
+        rel="noreferrer"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <Menu.Item leftSection={<IconBrandFacebook size={28} color="#1877F2" />}>
+          Compartilhar no Facebook
+        </Menu.Item>
+      </a>
       <a
         href={`http://twitter.com/share?text=${encodeURIComponent(twitterMessage)}&url=${alertUrl}&hashtags=acheMeuPet`}
         target="_blank"

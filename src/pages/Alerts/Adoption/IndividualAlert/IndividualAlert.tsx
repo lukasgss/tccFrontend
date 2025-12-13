@@ -2,7 +2,7 @@ import { Badge, Button, Divider, em, Modal, Text, Title, Tooltip, useMantineThem
 import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import { CalendarDots, Confetti, HeartStraight, Pencil } from "@phosphor-icons/react";
 import { IconFileText, IconFlag, IconMapPin } from "@tabler/icons-react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { useContext, useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -61,6 +61,7 @@ export default function IndividualAlert() {
 
   const { isAuthenticated, userData } = useContext(AuthContext);
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const theme = useMantineTheme();
 
@@ -72,6 +73,10 @@ export default function IndividualAlert() {
 
   const { mutateAsync: toggleAdoptionAlertFavoriteAsync } = useMutation({
     mutationFn: () => ToggleAdoptionAlertFavorite(data!.id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["userSavedAlerts"] });
+      queryClient.invalidateQueries({ queryKey: ["suggestedAlerts"] });
+    },
     onError: (e) => {
       const error = e as AxiosError<ApiError>;
       Notify({ type: "error", message: error.response?.data.message ?? defaultFormErrorMessage });
@@ -157,6 +162,7 @@ export default function IndividualAlert() {
       images: data.pet.images,
       gender: data.pet.gender,
       breed: data.pet.breed,
+      ownerId: data.owner.id,
     };
 
     const recentlyViewedPets = JSON.parse(localStorage.getItem("recentlyViewedAlerts") || "[]");
@@ -191,11 +197,11 @@ export default function IndividualAlert() {
       },
       {
         name: "Raça",
-        value: data.pet.breed.name,
+        value: data.pet.breed?.name || "Desconhecida",
       },
       {
         name: "Sexo",
-        value: data.pet.gender.name,
+        value: data.pet.gender?.name || "Desconhecido",
       },
       {
         name: "Castrado",
@@ -211,11 +217,11 @@ export default function IndividualAlert() {
     rightSection: [
       {
         name: "Idade",
-        value: data.pet.age.name,
+        value: data.pet.age?.name || "Desconhecida",
       },
       {
         name: "Porte",
-        value: data.pet.size.name,
+        value: data.pet.size?.name || "Desconhecido",
       },
       {
         name: "Cores",
@@ -274,7 +280,7 @@ export default function IndividualAlert() {
       <main className="relative">
         <MetaTags
           title={`Adoção de ${data.pet.name} | AcheMeuPet`}
-          description={`Conheça ${data.pet.name}, ${data.pet.gender.name === "Macho" ? "um" : "uma"} fofura à espera de um lar amoroso e um melhor amigo. Descubra sua personalidade única e como ${data.pet.gender.name === "Macho" ? "adotá-lo" : "adotá-la"} através do AcheMeuPet.`}
+          description={`Conheça ${data.pet.name}, ${data.pet.gender?.name === "Macho" ? "um" : data.pet.gender?.name === "Fêmea" ? "uma" : "um"} fofura à espera de um lar amoroso e um melhor amigo. Descubra sua personalidade única e como ${data.pet.gender?.name === "Macho" ? "adotá-lo" : data.pet.gender?.name === "Fêmea" ? "adotá-la" : "adotá-lo"} através do AcheMeuPet.`}
           keywords="adoção animal, adoção de animais, listagem de adoções, pets para adotar, AcheMeuPet, resgate animal, animais perdidos"
         />
         <Header />
@@ -331,7 +337,7 @@ export default function IndividualAlert() {
                     </Link>
                   )}
 
-                  <ShareButton petName={data.pet.name} petGender={data.pet.gender} />
+                  <ShareButton type="adoption" petName={data.pet.name} petGender={data.pet.gender?.name ?? null} />
 
                   <OtherOptionsButton items={getOtherOptionsItems()} loading={loadingAdoptionPoster} />
                 </div>
@@ -369,7 +375,11 @@ export default function IndividualAlert() {
               <div className="flex gap-1.5 mt-2 md:mt-3 mb-0.5">
                 <CalendarDots size={20} />
                 <span>
-                  {data.pet.gender.id === GenderEnum.Male ? "Adotado em" : "Adotada em"}{" "}
+                  {data.pet.gender?.id === GenderEnum.Male
+                    ? "Adotado em"
+                    : data.pet.gender?.id === GenderEnum.Female
+                      ? "Adotada em"
+                      : "Adotado em"}{" "}
                   {formatDateOnly(data.adoptionDate)}
                 </span>
               </div>
@@ -433,7 +443,7 @@ export default function IndividualAlert() {
                 <AttachmentFile
                   file={data.adoptionForm.fileUrl}
                   fileName={data.adoptionForm.fileName}
-                  downloadWhenClicked
+                  navigateWhenClicked
                 />
               </div>
             )}

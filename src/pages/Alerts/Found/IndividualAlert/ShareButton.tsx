@@ -2,23 +2,25 @@ import { ActionIcon, Button, Menu, Tooltip } from "@mantine/core";
 import { ShareNetwork } from "@phosphor-icons/react";
 import { useLocation } from "react-router-dom";
 import ShareDropdown from "../../../../components/Common/Share/ShareDropdown";
-import { getFoundAnimalAlertWhatsappMessage, getShareFoundAnimalAlertMessage } from "./shareContent";
+import { getAlertWhatsappMessage, getShareAlertMessage } from "../../../../utils/shareContent";
+import { AlertTypes } from "../../../Home/components/AlertCard";
 
 interface ShareButtonProps {
+  type: AlertTypes;
   petName: string;
-  petGender: string;
+  petGender: string | null;
 }
 
 const { VITE_APP_BASE_URL } = import.meta.env;
 
-export default function ShareButton({ petName, petGender }: Readonly<ShareButtonProps>) {
+export default function ShareButton({ type, petName, petGender }: Readonly<ShareButtonProps>) {
   const location = useLocation();
   const alertUrl = `${VITE_APP_BASE_URL}${location.pathname}`;
 
   const handleShareMobile = () => {
     navigator.share({
       title: "Animal encontrado",
-      text: getShareFoundAnimalAlertMessage(petGender, petName),
+      text: getShareAlertMessage(type, petGender, petName),
       url: alertUrl,
     });
   };
@@ -35,8 +37,8 @@ export default function ShareButton({ petName, petGender }: Readonly<ShareButton
         </Menu.Target>
         <Menu.Dropdown className="shadow">
           <ShareDropdown
-            whatsappMessage={getFoundAnimalAlertWhatsappMessage(petGender, petName, alertUrl)}
-            twitterMessage={getShareFoundAnimalAlertMessage(petGender, petName)}
+            whatsappMessage={getAlertWhatsappMessage(type, petGender, petName, alertUrl)}
+            twitterMessage={getShareAlertMessage(type, petGender, petName)}
           />
         </Menu.Dropdown>
       </Menu>

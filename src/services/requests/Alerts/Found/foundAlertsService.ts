@@ -35,3 +35,9 @@ export async function ToggleFoundAnimalAlertStatus(alertId: string): Promise<Fou
   const { data } = await API.put(`/found-alerts/rescue/${alertId}`);
   return data;
 }
+
+export async function ReportFoundAlert(alertId: string, reason: string): Promise<void> {
+  await API.post(`/found-reports/${alertId}`, {
+    reason,
+  });
+}

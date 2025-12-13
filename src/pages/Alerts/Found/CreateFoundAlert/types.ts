@@ -15,25 +15,25 @@ export const foundAnimalAlertSchema = z.object({
       "Apenas arquivos jpg, png e webp são aceitos.",
     ),
   existingImages: z.array(z.string().url()).optional(),
-  gender: z.string().optional(),
-  age: z.string({ required_error: requiredFormFieldErrorMessage }).min(1, requiredFormFieldErrorMessage),
-  colors: z.string({ required_error: requiredFormFieldErrorMessage }).array().nonempty({
+  gender: z.string().nullable().optional(),
+  age: z.string({ message: requiredFormFieldErrorMessage }).min(1, requiredFormFieldErrorMessage),
+  colors: z.string({ message: requiredFormFieldErrorMessage }).array().nonempty({
     message: requiredFormFieldErrorMessage,
   }),
-  breed: z.string().optional(),
+  breed: z.string().nullable().optional(),
   species: z
-    .string({ required_error: requiredFormFieldErrorMessage, invalid_type_error: requiredFormFieldErrorMessage })
+    .string({ message: requiredFormFieldErrorMessage, invalid_type_error: requiredFormFieldErrorMessage })
     .min(1, requiredFormFieldErrorMessage),
   size: z
-    .string({ required_error: requiredFormFieldErrorMessage, invalid_type_error: requiredFormFieldErrorMessage })
+    .string({ message: requiredFormFieldErrorMessage, invalid_type_error: requiredFormFieldErrorMessage })
     .min(1, requiredFormFieldErrorMessage),
   description: z.string().max(1000, { message: "Máximo de 1000 caracteres permitidos." }).optional(),
   state: z
-    .string({ required_error: requiredFormFieldErrorMessage, invalid_type_error: requiredFormFieldErrorMessage })
+    .string({ message: requiredFormFieldErrorMessage, invalid_type_error: requiredFormFieldErrorMessage })
     .min(1, requiredFormFieldErrorMessage),
-  neighborhood: z.string({ required_error: requiredFormFieldErrorMessage }).min(1, requiredFormFieldErrorMessage),
+  neighborhood: z.string({ message: requiredFormFieldErrorMessage }).min(1, requiredFormFieldErrorMessage),
   city: z
-    .string({ required_error: requiredFormFieldErrorMessage, invalid_type_error: requiredFormFieldErrorMessage })
+    .string({ message: requiredFormFieldErrorMessage, invalid_type_error: requiredFormFieldErrorMessage })
     .min(1, requiredFormFieldErrorMessage),
 });
 

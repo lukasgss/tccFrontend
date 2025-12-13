@@ -50,6 +50,7 @@ export enum FilterType {
 }
 
 type AdoptionQueryStringText =
+  | "cityId"
   | "speciesId"
   | "city"
   | "ageIds"

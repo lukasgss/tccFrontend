@@ -43,6 +43,12 @@ export default function FoundAnimalListings() {
 
   const [filteredValues, setFilteredValues] = useState<FilteredValues[]>([
     {
+      id: FilterType.City,
+      queryStringText: "city",
+      text: "Cidade",
+      filteredValues: [],
+    },
+    {
       id: FilterType.Species,
       queryStringText: "speciesId",
       text: "Espécie",
@@ -141,6 +147,13 @@ export default function FoundAnimalListings() {
       refetchBreeds();
     } else if (filterApplied === FilterType.Species && filteredVals.length === 0) {
       setDisableBreeds(true);
+    }
+
+    if (filterApplied === FilterType.City && filteredVals.length > 0) {
+      const cityValue = filteredVals[0];
+      setFilters((prev) =>
+        prev.map((filter) => (filter.id === FilterType.City ? { ...filter, availableValues: [cityValue] } : filter)),
+      );
     }
 
     setFiltersQueryString(buildQueryString(updatedFilters));
@@ -246,6 +259,13 @@ export default function FoundAnimalListings() {
   useEffect(() => {
     setFilters([
       {
+        id: FilterType.City,
+        text: "Cidade",
+        availableValues: [],
+        disabled: false,
+        shouldBeShown: false,
+      },
+      {
         id: FilterType.Species,
         text: "Espécie",
         availableValues: species ?? [],
@@ -291,6 +311,26 @@ export default function FoundAnimalListings() {
       },
     ]);
   }, [ages, breeds, colors, disableBreeds, genders, sizes, species]);
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const cityParam = searchParams.get("city");
+
+    if (cityParam) {
+      const cityFilter: DropdownData = {
+        label: decodeURIComponent(cityParam),
+        value: cityParam,
+      };
+
+      setFilters((prev) =>
+        prev.map((filter) => (filter.id === FilterType.City ? { ...filter, availableValues: [cityFilter] } : filter)),
+      );
+
+      setFilteredValues((prev) =>
+        prev.map((filter) => (filter.id === FilterType.City ? { ...filter, filteredValues: [cityFilter] } : filter)),
+      );
+    }
+  }, []);
 
   return (
     <>

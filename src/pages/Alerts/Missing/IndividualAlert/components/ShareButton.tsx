@@ -2,12 +2,11 @@ import { ActionIcon, Button, Menu, Tooltip } from "@mantine/core";
 import { ShareNetwork } from "@phosphor-icons/react";
 import { useLocation } from "react-router-dom";
 import ShareDropdown from "../../../../../components/Common/Share/ShareDropdown";
-import { Gender } from "../../../../../services/requests/Pets/types";
 import { getMissingAlertWhatsappMessage, getShareMissingAlertMessage } from "../shareContentHelper";
 
 interface ShareButtonProps {
   petName: string;
-  petGender: Gender;
+  petGender: string | null;
 }
 
 const { VITE_APP_BASE_URL } = import.meta.env;
@@ -19,7 +18,7 @@ export default function ShareButton({ petName, petGender }: Readonly<ShareButton
   const handleShareMobile = () => {
     navigator.share({
       title: "Ajude a encontrar este pet",
-      text: getShareMissingAlertMessage(petGender.name, petName),
+      text: getShareMissingAlertMessage(petGender, petName),
       url: alertUrl,
     });
   };
@@ -36,8 +35,8 @@ export default function ShareButton({ petName, petGender }: Readonly<ShareButton
         </Menu.Target>
         <Menu.Dropdown className="shadow">
           <ShareDropdown
-            whatsappMessage={getMissingAlertWhatsappMessage(petGender.name, petName, alertUrl)}
-            twitterMessage={getShareMissingAlertMessage(petGender.name, petName)}
+            whatsappMessage={getMissingAlertWhatsappMessage(petGender, petName, alertUrl)}
+            twitterMessage={getShareMissingAlertMessage(petGender, petName)}
           />
         </Menu.Dropdown>
       </Menu>

@@ -34,12 +34,12 @@ export default function EditAdoptionAlert() {
       images: [],
       existingImages: adoptionAlert?.pet.images,
       name: adoptionAlert?.pet.name ?? "",
-      gender: adoptionAlert?.pet.gender.id.toString() ?? "",
-      age: adoptionAlert?.pet.age.id.toString() ?? "",
+      gender: adoptionAlert?.pet.gender?.id.toString() ?? "",
+      age: adoptionAlert?.pet.age?.id.toString() ?? "",
       colors:
         (adoptionAlert?.pet.colors.map((color) => color.id.toString()) as [string, ...string[]]) ??
         ([""] as [string, ...string[]]),
-      breed: adoptionAlert?.pet.breed.id.toString() ?? "",
+      breed: adoptionAlert?.pet.breed?.id.toString() ?? "",
       species: adoptionAlert?.pet.species.id.toString() ?? "",
       isCastrated: getGeneralInfoValues(adoptionAlert?.pet.isCastrated),
       isVaccinated: getGeneralInfoValues(adoptionAlert?.pet.isVaccinated),
@@ -51,7 +51,7 @@ export default function EditAdoptionAlert() {
         adoptionAlert?.pet.species.name === "Gato"
           ? null
           : getGeneralInfoValues(adoptionAlert?.pet.isNegativeToLeishmaniasis),
-      size: adoptionAlert?.pet.size.id.toString() ?? "",
+      size: adoptionAlert?.pet.size?.id.toString() ?? "",
       description: adoptionAlert?.description ?? "",
       state: adoptionAlert?.stateId.toString() ?? "",
       neighborhood: adoptionAlert?.neighborhood ?? "",

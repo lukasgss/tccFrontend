@@ -10,6 +10,7 @@ export interface SuggestedAlert {
   description: string;
   registrationDate: string;
   adoptionDate: Date | null;
+  isFavorite: boolean;
   pet: Pet;
   owner: Owner;
 }

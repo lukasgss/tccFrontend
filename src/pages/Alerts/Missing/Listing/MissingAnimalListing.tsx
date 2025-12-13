@@ -49,6 +49,12 @@ export default function MissingAnimalListings() {
       filteredValues: [],
     },
     {
+      id: FilterType.City,
+      queryStringText: "city",
+      text: "Cidade",
+      filteredValues: [],
+    },
+    {
       id: FilterType.Age,
       queryStringText: "ageIds",
       text: "Idade",
@@ -141,6 +147,13 @@ export default function MissingAnimalListings() {
       refetchBreeds();
     } else if (filterApplied === FilterType.Species && filteredVals.length === 0) {
       setDisableBreeds(true);
+    }
+
+    if (filterApplied === FilterType.City && filteredVals.length > 0) {
+      const cityValue = filteredVals[0];
+      setFilters((prev) =>
+        prev.map((filter) => (filter.id === FilterType.City ? { ...filter, availableValues: [cityValue] } : filter)),
+      );
     }
 
     setFiltersQueryString(buildQueryString(updatedFilters));
@@ -254,6 +267,13 @@ export default function MissingAnimalListings() {
         shouldBeShown: true,
       },
       {
+        id: FilterType.City,
+        text: "Cidade",
+        availableValues: [],
+        disabled: false,
+        shouldBeShown: false,
+      },
+      {
         id: FilterType.Breed,
         text: "Raça",
         availableValues: breeds ?? [],
@@ -291,6 +311,26 @@ export default function MissingAnimalListings() {
       },
     ]);
   }, [ages, breeds, colors, disableBreeds, genders, sizes, species]);
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const cityParam = searchParams.get("city");
+
+    if (cityParam) {
+      const cityFilter: DropdownData = {
+        label: decodeURIComponent(cityParam),
+        value: cityParam,
+      };
+
+      setFilters((prev) =>
+        prev.map((filter) => (filter.id === FilterType.City ? { ...filter, availableValues: [cityFilter] } : filter)),
+      );
+
+      setFilteredValues((prev) =>
+        prev.map((filter) => (filter.id === FilterType.City ? { ...filter, filteredValues: [cityFilter] } : filter)),
+      );
+    }
+  }, []);
 
   return (
     <>

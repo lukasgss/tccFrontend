@@ -5,9 +5,10 @@ interface NoDataProps {
   title?: string;
   message?: string;
   className?: string;
+  centerText?: boolean;
 }
 
-export default function NoData({ title, message, className }: Readonly<NoDataProps>) {
+export default function NoData({ title, message, className, centerText = false }: Readonly<NoDataProps>) {
   const defaultMessage = "Ooh não! Nenhum item foi encontrado...";
 
   return (
@@ -17,7 +18,9 @@ export default function NoData({ title, message, className }: Readonly<NoDataPro
           {title}
         </Title>
       )}
-      <Text className="text-base md:text-lg font-bold">{message ?? defaultMessage}</Text>
+      <Text className={`text-base md:text-lg font-bold ${centerText ? "text-center" : ""}`}>
+        {message ?? defaultMessage}
+      </Text>
       <ProjectorScreen size={120} weight="duotone" />
     </div>
   );

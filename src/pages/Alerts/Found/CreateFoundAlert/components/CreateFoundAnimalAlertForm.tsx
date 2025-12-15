@@ -1,12 +1,14 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Text } from "@mantine/core";
 import { useMutation } from "@tanstack/react-query";
 import { AxiosError } from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import ConversationsSidebar from "../../../../../components/Chat/components/ConversationSidebar";
 import FormErrorMessage from "../../../../../components/Common/Errors/FormErrorMessage";
 import { ApiError } from "../../../../../components/Common/Errors/types";
+import ModalLocationNotFound from "../../../../../components/Common/Modals/ModalLocationNotFound";
 import ModalSuccess from "../../../../../components/Common/Modals/ModalSuccess";
 import { FoundAnimalAlertSchemaFormData, foundAnimalAlertSchema } from "../types";
 import { CreateFoundAnimalAlert } from "../../../../../services/requests/Alerts/Found/foundAlertsService";
@@ -15,6 +17,7 @@ import LocationDataFormStep from "./LocationDataFormStep";
 
 type CreateAlert = {
   alertData: FoundAnimalAlertSchemaFormData;
+  forceCreation: boolean;
 };
 
 interface FoundAnimalAlertFormProps {
@@ -28,6 +31,8 @@ export default function CreateFoundAnimalAlertForm({
 }: Readonly<FoundAnimalAlertFormProps>) {
   const [createdAlertId, setCreatedAlertId] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [failedToLocateAddress, setFailedToLocateAddress] = useState(false);
+  const [confirmedRegistration, setConfirmedRegistration] = useState(false);
 
   const navigate = useNavigate();
 
@@ -40,6 +45,7 @@ export default function CreateFoundAnimalAlertForm({
     setValue,
     resetField,
     handleSubmit,
+    getValues,
   } = useForm<FoundAnimalAlertSchemaFormData>({
     resolver: zodResolver(foundAnimalAlertSchema),
     mode: "onChange",
@@ -71,34 +77,47 @@ export default function CreateFoundAnimalAlertForm({
     values.images?.forEach((image) => formData.append("images", image));
   };
 
-  const createAlert = async (values: FoundAnimalAlertSchemaFormData) => {
+  const createAlert = async (values: FoundAnimalAlertSchemaFormData, forceCreation: boolean) => {
     const formData = new FormData();
     assignFormValues(values, formData);
 
-    const alertResponse = await CreateFoundAnimalAlert(formData);
+    if (forceCreation) {
+      formData.append("forceCreationWithNotFoundCoordinates", "true");
+    }
 
-    return alertResponse;
+    const alertResponse = await CreateFoundAnimalAlert(formData);
+    if (alertResponse.status.toString().startsWith("2")) {
+      return alertResponse.data;
+    }
+
+    return null;
   };
 
-  const { mutateAsync: createFoundAnimalAlertAsync } = useMutation({
-    mutationFn: ({ alertData }: CreateAlert) => createAlert(alertData),
+  const { mutateAsync: createFoundAnimalAlertAsync, isPending: isLoadingFoundAlerts } = useMutation({
+    mutationFn: ({ alertData, forceCreation }: CreateAlert) => createAlert(alertData, forceCreation),
     onSuccess: () => {
+      setFailedToLocateAddress(false);
       setErrorMessage(null);
     },
     onError: (err: AxiosError<ApiError>) => {
-      setErrorMessage(err.response?.data.message as string);
+      if (err.response?.status === 404) {
+        setFailedToLocateAddress(true);
+      } else {
+        setErrorMessage(err.response?.data.message as string);
+      }
     },
   });
 
-  const registerAlert = async (values: FoundAnimalAlertSchemaFormData) => {
-    const createdAlert = await createFoundAnimalAlertAsync({ alertData: values });
+  const registerAlert = async (values: FoundAnimalAlertSchemaFormData, forceCreation: boolean) => {
+    const createdAlert = await createFoundAnimalAlertAsync({ alertData: values, forceCreation });
     if (createdAlert) {
       setCreatedAlertId(createdAlert.id);
+      setConfirmedRegistration(false);
     }
   };
 
   const onSubmit = handleSubmit(async (values) => {
-    await registerAlert(values);
+    await registerAlert(values, confirmedRegistration);
   });
 
   const onIncreaseStep = () => {
@@ -118,6 +137,12 @@ export default function CreateFoundAnimalAlertForm({
       navigate("/encontrados");
     }
   };
+
+  useEffect(() => {
+    if (confirmedRegistration) {
+      onSubmit();
+    }
+  }, [confirmedRegistration]);
 
   return (
     <section className="relative">
@@ -166,6 +191,24 @@ export default function CreateFoundAnimalAlertForm({
         }
         onClickButton={() => handleSuccessModalButtonClick()}
         onClose={() => navigate("/encontrados")}
+      />
+
+      <ModalLocationNotFound
+        opened={failedToLocateAddress}
+        title="Não foi possível obter os dados da localização"
+        buttonText="Cadastrar mesmo assim"
+        loading={isLoadingFoundAlerts}
+        secondaryButtonText="Voltar"
+        subtitle={
+          <Text className="text-center">
+            Não foi possível obter o bairro &quot;{getValues("neighborhood")}&quot; no estado e cidade inseridos. Nesse
+            caso, não será exibido a localização no mapa da página de visualização do animal encontrado, gostaria de
+            continuar mesmo assim?
+          </Text>
+        }
+        onClickButton={() => setConfirmedRegistration(true)}
+        onClickSecondaryButton={() => setFailedToLocateAddress(false)}
+        onClose={() => setFailedToLocateAddress(false)}
       />
 
       <ConversationsSidebar />

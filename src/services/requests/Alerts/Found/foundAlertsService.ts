@@ -12,14 +12,12 @@ export default async function ListFoundAnimalAlerts(
   return data;
 }
 
-export async function CreateFoundAnimalAlert(formData: FormData): Promise<FoundAnimalAlertResponse> {
-  const { data } = await API.post("/found-alerts", formData, {
+export async function CreateFoundAnimalAlert(formData: FormData) {
+  return API.post("/found-alerts", formData, {
     headers: {
       "Content-Type": "multipart/form-data",
     },
   });
-
-  return data;
 }
 
 export async function GetFoundAnimalAlertById(alertId: string): Promise<FoundAnimalAlertResponse> {
